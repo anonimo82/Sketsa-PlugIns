@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="820" height="440" viewBox="0 0 820 440">
+
+  <rect width="820" height="440" fill="white"/>
+
+  <rect id="sourceRect"
+        x="70" y="70" width="160" height="100"
+        rx="14" fill="#d9d9d9" stroke="#333333"/>
+
+  <circle id="sourceCircle"
+          cx="350" cy="120" r="55"
+          fill="#bfbfbf" stroke="#333333"/>
+
+  <switch id="existingSwitch">
+    <g id="englishAlt" systemLanguage="en">
+      <rect x="520" y="65" width="180" height="80"
+            fill="#eeeeee" stroke="#333333"/>
+      <text x="610" y="115"
+            text-anchor="middle"
+            font-family="sans-serif"
+            font-size="22">English</text>
+    </g>
+    <g id="italianAlt" systemLanguage="it">
+      <rect x="520" y="65" width="180" height="80"
+            fill="#dddddd" stroke="#333333"/>
+      <text x="610" y="115"
+            text-anchor="middle"
+            font-family="sans-serif"
+            font-size="22">Italiano</text>
+    </g>
+    <g id="fallbackAlt">
+      <rect x="520" y="65" width="180" height="80"
+            fill="#cccccc" stroke="#333333"/>
+      <text x="610" y="115"
+            text-anchor="middle"
+            font-family="sans-serif"
+            font-size="22">Fallback</text>
+    </g>
+  </switch>
+
+  <text x="70" y="255" font-family="sans-serif" font-size="20">
+    Test source objects on the left; existing switch on the right.
+  </text>
+</svg>

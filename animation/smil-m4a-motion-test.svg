@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="420" viewBox="0 0 800 420">
+  <rect width="800" height="420" fill="white"/>
+  <path id="motionPath" d="M 100 220 C 240 60, 500 60, 680 220"
+        fill="none" stroke="#777" stroke-width="3" stroke-dasharray="8 6"/>
+  <rect id="box" x="70" y="190" width="60" height="40" rx="8" fill="#5b8def"/>
+  <text x="40" y="380" font-size="18" fill="#333">
+    Select box, Add Track → Motion / Motion Path, enter motionPath
+  </text>
+</svg>

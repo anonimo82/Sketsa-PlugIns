@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="520" viewBox="0 0 760 520">
+  <rect width="760" height="520" fill="#f4f4f4"/>
+
+  <text x="25" y="30" font-size="18">M3 document-wide timing</text>
+
+  <!-- A: document-wide syncbase across different targets -->
+  <rect x="40" y="60" width="40" height="24" fill="#e53935">
+    <animate id="moveA" attributeName="x" from="40" to="220"
+             begin="1s" dur="2s" fill="freeze"/>
+  </rect>
+
+  <circle cx="80" cy="125" r="16" fill="#1e88e5">
+    <animate id="moveB" attributeName="cx" from="80" to="260"
+             begin="moveA.end+0.5s" dur="2s" fill="freeze"/>
+  </circle>
+
+  <!-- B: begin list + restart=always. Restarts at 4s. -->
+  <rect x="40" y="175" width="35" height="22" fill="#43a047">
+    <animate attributeName="x" from="40" to="240"
+             begin="0s;4s" dur="2s" restart="always" fill="freeze"/>
+  </rect>
+
+  <!-- C: restart=never. Second begin must be ignored. -->
+  <rect x="40" y="225" width="35" height="22" fill="#8e24aa">
+    <animate attributeName="x" from="40" to="240"
+             begin="0s;3s" dur="2s" restart="never" fill="freeze"/>
+  </rect>
+
+  <!-- D: whenNotActive. 1s ignored (still active), 3s accepted. -->
+  <rect x="40" y="275" width="35" height="22" fill="#fb8c00">
+    <animate attributeName="x" from="40" to="240"
+             begin="0s;1s;3s" dur="2s"
+             restart="whenNotActive" fill="freeze"/>
+  </rect>
+
+  <!-- E1: repeatDur caps indefinite repeat -->
+  <circle cx="430" cy="80" r="18" fill="#00897b">
+    <animate attributeName="opacity"
+             begin="0s" dur="1s" repeatCount="indefinite"
+             repeatDur="2.5s" values="1;0.15;1" fill="remove"/>
+  </circle>
+
+  <!-- E2: end list: earliest valid absolute end is 3s -->
+  <circle cx="500" cy="80" r="18" fill="#5e35b1">
+    <animate attributeName="opacity"
+             begin="0s" dur="10s"
+             end="5s;3s" values="1;0.1" fill="remove"/>
+  </circle>
+
+  <!-- F: two different targets respond to same document-wide click -->
+  <rect x="390" y="155" width="45" height="28" fill="#3949ab">
+    <animate attributeName="x" from="390" to="610"
+             begin="click" dur="2s" fill="freeze"/>
+  </rect>
+
+  <circle cx="410" cy="230" r="18" fill="#d81b60">
+    <animate attributeName="cx" from="410" to="630"
+             begin="click+0.5s" dur="2s" fill="freeze"/>
+  </circle>
+
+  <!-- G: event begin list + restart=always; every click can restart -->
+  <rect x="390" y="300" width="45" height="28" fill="#6d4c41">
+    <animate attributeName="x" from="390" to="610"
+             begin="click;8s" dur="2s"
+             restart="always" fill="freeze"/>
+  </rect>
+
+  <text x="25" y="390" font-size="14">
+    Use timeline scrub at 0 / 1 / 2 / 3 / 3.5 / 4 / 5 / 8 seconds.
+  </text>
+  <text x="25" y="415" font-size="14">
+    For event tests, put playhead near 1s and click anywhere on the canvas.
+  </text>
+</svg>

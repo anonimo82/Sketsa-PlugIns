@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: kiyut.sketsa.modules.links
+OpenIDE-Module-Install: kiyut/sketsa/modules/links/Installer.class
+OpenIDE-Module-Localizing-Bundle: kiyut/sketsa/modules/links/Bundle.properties
+OpenIDE-Module-Specification-Version: 0.1.1

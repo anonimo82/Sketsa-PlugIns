@@ -1,0 +1,36 @@
+Animation 0.4
+- Better Timing Model, due to Apache Batik exposed public API
+- Improved Sketsa integration
+
+Animation 0.3
+- Timeline could distinguish indefinite timing value by using different handle
+- Improved Sketsa integration
+
+Animation 0.2
+- Improved Timeline 
+  * Able to move/update timeline start and duration (UI only)
+  * But still not updating DOM
+
+Animation 0.1.1
+- Improved animation editor GUI
+- Remove [debug] text
+
+Animation 0.1
+- Add Menu - Windows - Animation
+- Add Timeline (static UI)
+- Add read only animation elements and attributes
+
+
+Planned --------------------------------------------------
+
+Animation 0.5
+- Animation Editor able to update DOM
+- Animation Editor still not able to create new animation element
+
+Animation 0.8
+- Animation Editor able to create new animation element
+
+Animation 1.0
+- Final Release
+- Animation Editor expected to work (create, update, and read)
+- Minor bug allowed, major bug should be fixed

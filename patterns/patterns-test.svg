@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="820" height="420" viewBox="0 0 820 420">
+
+  <defs>
+    <pattern id="existingPattern"
+             x="0" y="0" width="20" height="20"
+             patternUnits="userSpaceOnUse">
+      <rect width="20" height="20" fill="#ffffff"/>
+      <rect width="10" height="20" fill="#b0b0b0"/>
+    </pattern>
+  </defs>
+
+  <rect width="820" height="420" fill="white"/>
+
+  <rect id="targetRect"
+        x="70" y="70" width="250" height="140"
+        fill="#dddddd" stroke="#333333" stroke-width="8"/>
+
+  <circle id="targetCircle"
+          cx="520" cy="140" r="75"
+          fill="url(#existingPattern)"
+          stroke="#333333" stroke-width="8"/>
+
+  <path id="targetPath"
+        d="M 100 320 C 270 240, 480 390, 700 290"
+        fill="none"
+        stroke="#555555"
+        stroke-width="18"/>
+</svg>

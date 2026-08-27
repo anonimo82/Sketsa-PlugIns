@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="820" height="420" viewBox="0 0 820 420">
+
+  <defs>
+    <symbol id="existingStar">
+      <path d="M 0 -30 L 8 -10 L 30 -10 L 12 4 L 18 26 L 0 13 L -18 26 L -12 4 L -30 -10 L -8 -10 Z"
+            fill="#cccccc" stroke="#333333"/>
+    </symbol>
+  </defs>
+
+  <rect width="820" height="420" fill="white"/>
+
+  <rect id="sourceRect"
+        x="60" y="70" width="140" height="90"
+        rx="12" fill="#dddddd" stroke="#333333"/>
+
+  <circle id="sourceCircle"
+          cx="330" cy="115" r="52"
+          fill="#bbbbbb" stroke="#333333"/>
+
+  <use id="existingUse"
+       href="#existingStar"
+       xlink:href="#existingStar"
+       x="550" y="125"/>
+
+  <text x="60" y="240" font-family="sans-serif" font-size="20">
+    Create symbol from rectangle or circle, then insert uses.
+  </text>
+</svg>

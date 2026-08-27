@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+    <folder name="Actions">
+        <folder name="Window">
+            <file name="kiyut-sketsa-modules-animation-windows-AnimationTopComponentAction.instance">
+                <attr name="instanceClass" stringvalue="kiyut.sketsa.modules.animation.actions.AnimationTopComponentAction"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Menu">
+        <folder name="Window">
+            <file name="kiyut-sketsa-modules-animation-windows-AnimationTopComponentAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/kiyut-sketsa-modules-animation-windows-AnimationTopComponentAction.instance"/>
+                <attr name="position" intvalue="160"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Shortcuts">
+        <file name="DO-7.shadow">
+            <attr name="originalFile" stringvalue="Actions/Window/kiyut-sketsa-modules-animation-windows-AnimationTopComponentAction.instance"/>
+        </file>
+    </folder>
+    <folder name="Windows2">
+        <folder name="Components">
+            <file name="AnimationTopComponent.settings" url="windows/AnimationTopComponent.settings"/>
+        </folder>
+        <folder name="Modes">
+            <folder name="bottomSlidingSide">
+                <file name="AnimationTopComponent.wstcref" url="windows/AnimationTopComponent.wstcref"/>
+            </folder>
+        </folder>
+    </folder>
+</filesystem>

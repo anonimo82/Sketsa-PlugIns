@@ -1,0 +1,29 @@
+<?xml version="1.0" standalone="no"?>
+<svg contentScriptType="text/ecmascript" width="860" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="full"
+    zoomAndPan="magnify" contentStyleType="text/css" viewBox="0 0 860 600" height="600" preserveAspectRatio="xMidYMid meet"
+    xmlns="http://www.w3.org/2000/svg" version="1.0">
+    <rect fill="#f5f5f5" height="600" width="860"/>
+    <text font-size="18" x="20" y="28">M5 Full Authoring Expansion</text>
+    <rect x="60" y="70" fill="#e53935" width="80" id="authorRect" height="50" stroke="#222"/>
+    <circle fill="#1e88e5" r="25" cx="250" id="authorCircle" cy="95" stroke="#111111" stroke-width="2"/>
+    <path fill="#43a047" d="M360 70 L420 70 L390 120 Z" id="authorMorph"/>
+    <g id="authorGroup" transform="translate(540,95)">
+        <rect fill="#8e24aa" x="-30" width="60" height="40" y="-20"/>
+    </g>
+    <path fill="none" d="M80 260 C230 190 380 320 560 240" stroke-width="2" id="route" stroke="#777"/>
+    <path fill="#fb8c00" id="motionMarker" d="M-12 -7 L12 -7 L0 -28 Z" transform="translate(80,260)">
+        <animateMotion data-sketsa-motion-path-id="route" dur="5s" data-sketsa-track="Motion Path" rotate="auto" fill="freeze"
+            data-sketsa-motion-anchor="center" calcMode="linear">
+            <mpath href="#route" xlink:href="#route"
+               />
+        </animateMotion>
+    </path>
+    <rect fill="#00897b" x="80" width="45" height="30" id="multiA" y="400"/>
+    <rect fill="#00897b" x="160" width="45" height="30" id="multiB" y="400"/>
+    <rect fill="#00897b" x="240" width="45" height="30" id="multiC" y="400">
+        <animateTransform type="translate" dur="4s" keyTimes="0;1" data-sketsa-track="translate" fill="freeze" values="0 0;40 0"
+            data-sketsa-multi-edit-group="multi-ff8baf05-0f46-4047-b9af-21a312bc2c21" attributeName="transform"
+            calcMode="linear"/>
+    </rect>
+    <text font-size="13" x="20" y="500">Save/reopen after authoring; SMIL must remain portable.</text>
+</svg>

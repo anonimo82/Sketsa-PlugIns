@@ -1,0 +1,3 @@
+Sketsa Text Spacing plugin port/test project.
+This project contains original integration code created for this test build.
+Use with Sketsa 9.1 for development/testing.

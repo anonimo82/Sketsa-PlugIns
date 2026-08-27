@@ -1,0 +1,76 @@
+SKETSA SWITCH 0.2.6 — LANGUAGE FIELD EDITING FIX
+================================================
+
+Previous: 0.2.5
+Current:  0.2.6
+
+FIX ONLY
+
+Reported:
+After adding automatic DOM synchronization, entering a different
+systemLanguage became difficult because the sync timer could restore the old
+DOM value when the field lost focus, including when clicking Update Language.
+
+Fix:
+- user edits mark the systemLanguage field as DIRTY
+- while DIRTY, automatic DOM synchronization is suspended
+- clicking Update Language commits the value and clears DIRTY
+- after commit, native Undo/Redo can again synchronize the field from the DOM
+- programmatic selection/load does not mark the field dirty
+
+TEST A — NORMAL EDIT
+1. Select italianAlt.
+2. Field shows it.
+3. Click field and type fr.
+4. Wait 2 seconds.
+
+Expected:
+- field remains fr.
+- it is NOT reverted to it by the timer.
+
+5. Click Update Language.
+
+Expected:
+- fr is committed successfully.
+- simulation updates normally.
+
+TEST B — CLICKING UPDATE MUST NOT LOSE VALUE
+1. Select italianAlt.
+2. Type de in systemLanguage.
+3. Immediately click Update Language.
+
+Expected:
+- de is committed.
+- old DOM value is not restored before the button action.
+
+TEST C — UNDO/REDO SYNC AFTER COMMIT
+1. Commit fr with Update Language.
+2. Undo once.
+
+Expected:
+- DOM returns to previous language.
+- field automatically updates to previous language.
+
+3. Redo once.
+
+Expected:
+- DOM returns to fr.
+- field automatically updates to fr.
+
+TEST D — UNSAVED TYPING MUST NOT BE OVERRIDDEN
+1. Type a temporary value but do NOT click Update Language.
+2. Click in another non-selection-changing control in the Switch panel.
+
+Expected:
+- typed value stays visible.
+- timer does not overwrite it.
+
+TEST E — NEW SELECTION
+1. Leave an uncommitted temporary value in the field.
+2. Select another switch alternative.
+
+Expected:
+- panel loads the newly selected alternative's real systemLanguage.
+- dirty state is reset for the new selection.
+
+No unrelated feature tests were added.

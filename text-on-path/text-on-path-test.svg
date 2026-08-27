@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="800" height="420" viewBox="0 0 800 420">
+  <rect width="800" height="420" fill="white"/>
+
+  <path id="curve1"
+        d="M 70 180 C 220 40, 500 40, 700 180"
+        fill="none" stroke="#888" stroke-width="2"/>
+
+  <path id="curve2"
+        d="M 80 320 C 250 220, 500 380, 720 270"
+        fill="none" stroke="#bbb" stroke-width="2"/>
+
+  <text id="plainText" x="80" y="80"
+        font-family="sans-serif" font-size="28">
+    Text to attach to curve1
+  </text>
+
+  <text id="existingText" font-family="sans-serif" font-size="24">
+    <textPath href="#curve2" xlink:href="#curve2" startOffset="10%">
+      Existing textPath
+    </textPath>
+  </text>
+</svg>

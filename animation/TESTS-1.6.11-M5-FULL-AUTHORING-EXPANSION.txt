@@ -1,0 +1,296 @@
+ANIMATION EDITOR 1.6.11 — MILESTONE 5
+FULL AUTHORING EXPANSION
+==========================================
+
+MILESTONE RULE
+M5 is ONE milestone. It closes only when A-J and all regressions pass.
+
+PRIMARY FILE
+  TEST-M5-FULL-AUTHORING-1.6.0.svg
+
+A — TRANSFORM AUTHORING
+Select authorGroup.
+Create translate, scale, rotate, skewX, skewY tracks from Add Track.
+Edit end keys and verify Play/scrub. Save/reopen and verify tracks survive.
+
+B — VISIBILITY AUTHORING
+Select authorRect -> Add Track -> State / visibility.
+Use visible;hidden and calcMode=discrete.
+Expected: visibility changes and survives save/reopen.
+
+C — PATH MORPH d AUTHORING
+Select authorMorph -> Geometry / path d.
+Edit second key to a compatible path topology.
+Expected: morph previews and survives save/reopen.
+
+D — GENERIC NUMERIC
+Select authorCircle. The supplied test SVG now has an authored black stroke
+with stroke-width=2 so the numeric animation has a visible static base.
+Add Track -> Generic / Numeric…
+Use stroke-width.
+Set first key to 2 and end key to 12, duration 4s.
+Expected: border grows smoothly from 2 to 12 with Play/scrub.
+
+Also verify the already-reported authoring case:
+while Animation Editor is open, change the circle stroke color from Sketsa
+Properties. The stroke must appear/update without requiring manual scrub.
+
+E — GENERIC COLOR
+Select authorCircle -> Generic / Color…
+Use fill and another color as end key.
+Expected: color interpolation previews.
+
+F — GENERIC DISCRETE
+Create a Generic / Discrete… property and edit values.
+Expected: calcMode starts as discrete and values switch discretely.
+
+G — ADVANCED TIMING / COMPOSITION UI
+On a non-set track author and preserve:
+Begin, End, Repeat, RepeatDur, Restart,
+Calc Mode including paced,
+Additive replace/sum,
+Accumulate none/sum,
+Key Splines in spline mode.
+Save/reopen and verify all fields.
+
+H — MOTION REFERENCE + INLINE
+Select motionMarker.
+Create Motion with #route (or route).
+Expected mpath href/xlink:href and xmlns:xlink.
+Then edit Motion Path field to inline path data beginning M...
+Expected mpath removed and animateMotion path="..." saved.
+Save/reopen both forms.
+
+I — MULTI-OBJECT AUTHORING
+Multi-select multiA, multiB, multiC on canvas.
+Add opacity or translate.
+Expected all selected objects receive the track in one native Undo transaction.
+The first selected object is then bound for timeline editing.
+Save/reopen verifies all three.
+
+J — PORTABLE SVG
+After A-I save/reopen.
+Verify standard SVG/SMIL nodes and attributes remain usable:
+animate, animateTransform, animateMotion, set,
+mpath href/xlink:href or inline path,
+timing, additive, accumulate, calcMode.
+No preview-only runtime state may be required.
+
+REGRESSIONS
+1. M4 A-I
+2. M3 timing A-G
+3. M2 Motion A-G
+4. M1 Generic Animate
+5. Toy_train_SMIL.svg
+6. Live chatbot.svg
+7. animateTransform.svg
+8. original Motion Path regression
+9. TEST-ARC-MORPH-1.1.6.svg
+10. event timing behavior from 1.4.3
+
+CERTIFICATION
+If A-J and every regression pass, M5 and the five-milestone roadmap are complete.
+
+
+M5 FIX-ONLY NOTE — 1.6.1
+------------------------
+During Test A, after previewing a Transform track (for example skewX),
+delete that track.
+
+Expected:
+- the deleted track disappears from timeline/DOM;
+- its animated transform disappears immediately from the canvas;
+- the object returns to its authored/static transform;
+- any other remaining animation tracks continue to evaluate normally.
+
+This is a correction to Test A, not a new test.
+
+
+M5 FIX-ONLY NOTE — 1.6.2
+------------------------
+Correction to the existing Test A only.
+
+1. Delete an active Transform track (for example skewX) while the playhead is
+   at a time where the transform is visible.
+   Expected: the effect disappears immediately, without touching the scrubber.
+
+2. While editing/applying key values for translate/scale/rotate/skewX/skewY,
+   the selected object must remain at its correct authored position.
+   It must never jump to the upper-left corner or accumulate a previous
+   preview matrix.
+
+No new test case has been added.
+
+
+M5 FIX-ONLY NOTE — 1.6.3
+------------------------
+Correction to existing Test D only.
+
+- A stroke added/changed from Sketsa Properties while Animation Editor is open
+  must be picked up immediately by the generic stroke-width runtime.
+- If the old GVT node has no StrokeShapePainter, Animation Editor refreshes and
+  reacquires the current node/painter graph.
+- No manual scrub should be required to make the stroke appear.
+
+No new test case has been added.
+
+
+M5 FIX-ONLY NOTE — 1.6.4
+------------------------
+Correction to existing Test D only.
+
+After previewing the Generic Numeric stroke-width track (2 -> 12), delete it.
+
+Expected immediately, without scrub:
+- the animated stroke-width contribution disappears;
+- the circle returns to its authored/static stroke-width=2;
+- the authored stroke color remains;
+- any other remaining tracks keep working.
+
+The same authored-state reset is applied to generic fill/stroke presentation
+properties when their tracks are deleted.
+
+No new test case has been added.
+
+
+M5 FIX-ONLY NOTE — 1.6.5
+------------------------
+GLOBAL correction to the existing deletion behavior.
+
+For ANY authored animation track already covered by M5 tests:
+- transform (translate/scale/rotate/skew)
+- motion
+- visibility
+- opacity
+- primitive geometry
+- path d morph
+- fill/stroke presentation
+- generic numeric/color/discrete
+- set
+
+Deleting the track must immediately remove its live preview contribution,
+without scrub, and restore the authored/static SVG state for that object.
+All remaining tracks in the document must then be re-evaluated at the current
+editor time.
+
+This does not add a new test case; it makes the same deletion expectation
+consistent across every existing animation type.
+
+
+M5 FIX-ONLY NOTE — 1.6.6
+------------------------
+GLOBAL pivot correction to existing Test A.
+
+Editor-created transforms now use the object's local visual center as the
+default pivot:
+- rotate: standard rotate(angle cx cy)
+- scale: standard SMIL helper translate(+pivot), scale, translate(-pivot)
+- skewX: standard SMIL helper translate(+pivot), skewX, translate(-pivot)
+- skewY: standard SMIL helper translate(+pivot), skewY, translate(-pivot)
+
+The helper animateTransform nodes are standard SVG/SMIL, hidden from the
+timeline, synchronized with the main track timing, and deleted together with
+the main track. This keeps save/reopen behavior portable.
+
+Translate is unchanged because translation has no pivot.
+
+No new test case has been added.
+
+
+M5 FIX-ONLY NOTE — 1.6.7
+------------------------
+Correction to the existing global delete expectation.
+
+State / visibility:
+after the object has become hidden, delete the visibility track.
+
+Expected immediately, without scrub:
+- the deleted visibility contribution disappears;
+- the object returns to its authored/static visibility;
+- inherited visibility is restored through the whole GVT subtree;
+- any remaining tracks continue to evaluate normally.
+
+No new test case has been added.
+
+
+M5 FIX-ONLY NOTE — 1.6.8
+------------------------
+Correction to existing Test H / Motion authoring.
+
+The supplied motionMarker has:
+  transform="translate(80,260)"
+and the referenced route begins at:
+  M80 260
+
+For editor-owned Motion, the visual center anchor is now converted through the
+target's authored static transform into parent user space before Motion is
+composed. The static placement must therefore NOT be applied twice.
+
+Expected for #route:
+- marker visual center sits on the visible curve;
+- at t=0 it is centered on the route start near (80,260);
+- throughout scrub/Play it follows the route exactly;
+- rotate=auto changes orientation but not path attachment.
+
+No new test case has been added.
+
+
+M5 FIX-ONLY NOTE — 1.6.9
+------------------------
+Motion Anchor is now configurable in the existing Test H:
+
+- Center: editor-friendly default for newly-authored Motion tracks.
+- Local origin: anchors local (0,0) to the motion path.
+- Custom: anchors the supplied local X/Y point.
+- SVG native: no Sketsa anchor compensation.
+
+IMPORT FALLBACK:
+If an imported SVG animateMotion has no data-sketsa-motion-anchor metadata,
+Animation Editor automatically uses SVG native semantics. Existing external
+SVG files are therefore not silently converted to center-anchor behavior.
+
+No new test case has been added.
+
+
+M5 FIX-ONLY NOTE — 1.6.10
+-------------------------
+Motion anchor compatibility correction.
+
+"SVG native" is now explicitly "SVG native (import)" and is treated as an
+IMPORT FALLBACK, not as a normal authoring anchor mode.
+
+- Newly-created editor Motion tracks default to Center.
+- Editor-authored tracks should use Center, Local origin, or Custom.
+- Imported/unmarked animateMotion keeps native SVG behavior automatically.
+- Applying inspector changes to an imported/native track does NOT add Sketsa
+  anchor metadata unless the user explicitly chooses Center/Local origin/Custom.
+- An editor-authored track cannot be switched to the import-only native mode,
+  avoiding the static-transform double-placement case seen in Test H.
+
+No new test case has been added.
+
+
+M5 FIX-ONLY NOTE — 1.6.11
+-------------------------
+Correction to existing Test I / multi-object authoring.
+
+Tracks created by ONE Add Track operation on multiple selected objects are now
+linked with a persistent data-sketsa-multi-edit-group identifier.
+
+Editing the selected linked track propagates the SAME authoring changes to all
+tracks created by that multi-object operation:
+- duration / timing / fill / calc / additive / accumulate;
+- keyframe values and key times;
+- Add Keyframe / Delete Keyframe;
+- Set values;
+- Motion authoring fields.
+
+The edit remains ONE native Sketsa Undo transaction.
+
+Deleting a track is intentionally NOT propagated: deleting the track from one
+object affects only that object, as required by Test I.
+
+After the multi-object Add Track operation the document-wide runtime is also
+re-evaluated immediately so all linked objects preview at the same time.
+
+No new test case has been added.
