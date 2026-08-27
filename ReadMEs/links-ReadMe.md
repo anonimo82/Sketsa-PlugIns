@@ -1,53 +1,53 @@
 # Sketsa Links
 
-## Panoramica
+## Overview
 
-**Sketsa Links** è un modulo per Sketsa che aggiunge un pannello dedicato alla creazione e alla modifica di collegamenti SVG. Il plugin lavora direttamente sulla struttura DOM del documento e consente di trasformare un elemento grafico selezionato nel contenuto di un elemento `<a>` senza perdere il nodo originale.
+**Sketsa Links** is a Sketsa module that adds a dedicated panel for creating and editing SVG hyperlinks. The plugin works directly on the document DOM and can wrap a selected graphic element inside an `<a>` element without losing the original node.
 
-Il progetto è scritto in Java per la piattaforma NetBeans utilizzata da Sketsa e richiede Java 11. Il manifest dichiara il modulo `kiyut.sketsa.modules.links` con specification version **0.1.1**.
+The project is written in Java for the NetBeans Platform used by Sketsa and targets Java 11. The manifest declares the module `kiyut.sketsa.modules.links` with specification version **0.1.1**.
 
-## Funzioni principali
+## Main Features
 
-- Creazione di un collegamento attorno a un singolo oggetto SVG selezionato.
-- Modifica di un collegamento `<a>` già esistente.
-- Gestione dei campi **URL**, **Target** e **Title**.
-- Scrittura sia di `href` sia di `xlink:href`, per mantenere compatibilità con documenti SVG che usano l'una o l'altra forma.
-- Rimozione del collegamento senza eliminare il contenuto grafico racchiuso nel tag `<a>`.
-- Riconoscimento automatico del link associato all'oggetto selezionato.
-- Integrazione con il sistema di selezione e con il canvas attivo di Sketsa.
+- Create a link around a single selected SVG object.
+- Edit an existing `<a>` link.
+- Manage **URL**, **Target**, and **Title** fields.
+- Write both `href` and `xlink:href` for compatibility with SVG documents using either form.
+- Remove a link without deleting the graphic content wrapped by `<a>`.
+- Automatically detect the link associated with the selected object.
+- Integrate with Sketsa's current selection and active canvas.
 
 ## Undo / Redo
 
-La versione 0.1.1 tratta l'aggiornamento di un link esistente come una **sostituzione strutturale del wrapper `<a>`**, preservandone i figli. Questa scelta permette al `DOMUndoManager` di Sketsa di registrare correttamente le modifiche a URL, target e titolo e di ripristinarle tramite Undo/Redo.
+Version 0.1.1 treats updates to an existing link as a **structural replacement of the `<a>` wrapper**, while preserving its child nodes. This allows Sketsa's `DOMUndoManager` to record changes to URL, target, and title correctly and restore them through Undo/Redo.
 
-Anche la creazione e la rimozione del wrapper vengono eseguite attraverso operazioni DOM compatibili con la cronologia del documento.
+Creation and removal of the wrapper are also performed through DOM operations compatible with the document history.
 
-## Struttura SVG
+## SVG Structure
 
-Un collegamento creato dal plugin ha, in forma semplificata, questa struttura:
+A link created by the plugin has, in simplified form, the following structure:
 
 ```xml
 <a href="https://example.com"
    xlink:href="https://example.com"
    target="_blank"
    title="Example">
-    <!-- elemento SVG selezionato -->
+    <!-- selected SVG element -->
 </a>
 ```
 
-Il plugin conserva il contenuto dell'elemento selezionato e, quando un link viene rimosso, reinserisce i nodi figli al posto del wrapper.
+The plugin preserves the selected element's content and, when a link is removed, reinserts the wrapper's children in its place.
 
-## Integrazione con Sketsa
+## Sketsa Integration
 
-`LinksIntegrator` installa il pannello nell'interfaccia di Sketsa. `Installer` ritenta l'integrazione tramite un timer Swing durante il ripristino del modulo, in modo da agganciarsi all'interfaccia anche quando i componenti dell'applicazione non sono ancora stati costruiti al momento del caricamento iniziale.
+`LinksIntegrator` installs the panel into the Sketsa interface. During module restoration, `Installer` retries the integration through a Swing timer so that the plugin can attach even when the application's UI components have not yet been fully created at initial module load time.
 
-## Sorgenti principali
+## Main Source Files
 
-- `src/kiyut/sketsa/modules/links/integration/LinksPanel.java` — interfaccia, gestione selezione e operazioni DOM.
-- `src/kiyut/sketsa/modules/links/integration/LinksIntegrator.java` — inserimento del pannello nell'interfaccia Sketsa.
-- `src/kiyut/sketsa/modules/links/Installer.java` — inizializzazione del modulo.
+- `src/kiyut/sketsa/modules/links/integration/LinksPanel.java` — UI, selection handling, and DOM operations.
+- `src/kiyut/sketsa/modules/links/integration/LinksIntegrator.java` — panel integration into Sketsa.
+- `src/kiyut/sketsa/modules/links/Installer.java` — module initialization.
 
-## Ambiente di riferimento
+## Reference Environment
 
 - Sketsa 9.1
 - NetBeans 11.3

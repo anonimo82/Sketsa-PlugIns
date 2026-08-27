@@ -1,53 +1,53 @@
 # Sketsa Text Spacing
 
-## Panoramica
+## Overview
 
-**Sketsa Text Spacing** estende gli strumenti di stile del testo di Sketsa con controlli indipendenti per `letter-spacing` e `word-spacing` SVG/CSS.
+**Sketsa Text Spacing** extends Sketsa's text styling tools with independent controls for the SVG/CSS `letter-spacing` and `word-spacing` properties.
 
-Il modulo `kiyut.sketsa.modules.textspacing` ha specification version **0.3.4** ed è configurato per Java 11.
+The module `kiyut.sketsa.modules.textspacing` has specification version **0.3.4** and targets Java 11.
 
-## Funzioni principali
+## Main Features
 
-- Regolazione di **Letter spacing** in pixel.
-- Regolazione di **Word spacing** in pixel.
-- Intervallo dei controlli da `-1000` a `1000`, con passo `0.5`.
-- Applicazione immediata alla singola selezione testuale corrente.
-- Supporto sia allo stile CSS sia agli attributi di presentazione SVG.
-- Refresh esplicito del canvas dopo la modifica per aggiornare immediatamente il rendering Batik/Sketsa.
-- Integrazione nel componente nativo **Text Style** invece di creare un editor separato.
+- Adjust **Letter spacing** in pixels.
+- Adjust **Word spacing** in pixels.
+- Control range from `-1000` to `1000`, with a `0.5` step.
+- Apply changes immediately to the current single text selection.
+- Support both CSS style properties and SVG presentation attributes.
+- Explicitly refresh the canvas after a change so Batik/Sketsa rendering updates immediately.
+- Integrate into the native **Text Style** component instead of creating a separate editor.
 
-## Gestione della selezione e del focus
+## Selection and Focus Handling
 
-Il pannello conserva l'ultimo elemento di testo valido quando il focus passa dal documento ai controlli del plugin. Questo evita che l'editor si disattivi soltanto perché il global lookup di NetBeans diventa temporaneamente vuoto mentre si interagisce con uno spinner.
+The panel preserves the last valid text element when focus moves from the document to the plugin controls. This prevents the editor from becoming inactive merely because the NetBeans global lookup temporarily becomes empty while the user interacts with a spinner.
 
-I pulsanti freccia degli spinner sono inoltre resi non focalizzabili, riducendo le interferenze con il focus del documento SVG.
+The spinner arrow buttons are also made non-focusable, reducing interference with SVG document focus.
 
-## Formati supportati
+## Supported Property Formats
 
-`DOMUtilities.updateProperty()` può scrivere una proprietà secondo le preferenze di formattazione di Sketsa:
+`DOMUtilities.updateProperty()` can write a property according to Sketsa's formatting preferences:
 
-- nello `style` CSS dell'elemento;
-- come attributo di presentazione SVG.
+- in the element's CSS `style`;
+- as an SVG presentation attribute.
 
-Il plugin legge entrambe le forme, per cui una riselezione del testo non azzera i controlli quando il documento usa un formato diverso da quello atteso.
+The plugin reads both forms, so reselecting text does not reset the controls when the document uses a different representation from the expected one.
 
-Un valore zero viene scritto come assenza della proprietà; valori interi e decimali vengono serializzati in `px`.
+A zero value is written as absence of the property; integer and decimal values are serialized in `px`.
 
 ## Undo / Redo
 
-L'applicazione di letter-spacing e word-spacing viene racchiusa in una singola transazione `DOMUndoManager` denominata **Text Spacing**, così le due proprietà vengono annullate o ripristinate insieme.
+Applying letter spacing and word spacing is wrapped in a single `DOMUndoManager` transaction named **Text Spacing**, so the two properties are undone or restored together.
 
-## Aggiornamento visivo
+## Visual Refresh
 
-La versione 0.3.4 richiama esplicitamente `VectorCanvas.refresh()` dopo `DOMUtilities.updateProperty()`. Questo forza Sketsa/Batik a ricostruire il testo renderizzato subito dopo la modifica invece di attendere un successivo evento di repaint o selezione.
+Version 0.3.4 explicitly calls `VectorCanvas.refresh()` after `DOMUtilities.updateProperty()`. This forces Sketsa/Batik to rebuild the rendered text immediately after a change instead of waiting for a later repaint or selection event.
 
-## Sorgenti principali
+## Main Source Files
 
-- `src/kiyut/sketsa/modules/textspacing/integration/TextSpacingPanel.java` — controlli di spaziatura, lettura/scrittura proprietà e Undo/Redo.
-- `src/kiyut/sketsa/modules/textspacing/integration/TextStyleIntegrator.java` — integrazione nel pannello Text Style.
-- `src/kiyut/sketsa/modules/textspacing/Installer.java` — inizializzazione.
+- `src/kiyut/sketsa/modules/textspacing/integration/TextSpacingPanel.java` — spacing controls, property reading/writing, and Undo/Redo.
+- `src/kiyut/sketsa/modules/textspacing/integration/TextStyleIntegrator.java` — integration into the Text Style panel.
+- `src/kiyut/sketsa/modules/textspacing/Installer.java` — initialization.
 
-## Ambiente di riferimento
+## Reference Environment
 
 - Sketsa 9.1
 - NetBeans 11.3

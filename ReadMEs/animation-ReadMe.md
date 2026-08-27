@@ -1,30 +1,30 @@
 # Sketsa Animation Editor
 
-## Panoramica
+## Overview
 
-**Sketsa Animation Editor** è il progetto più esteso dell'archivio. Fornisce a Sketsa un editor visuale a tracce e keyframe per animazioni SVG/SMIL, con timeline, inspector, riproduzione/scrubbing e anteprima live sul canvas.
+**Sketsa Animation Editor** is the largest project in the archive. It adds a visual track-and-keyframe editor for SVG/SMIL animation to Sketsa, including a timeline, property inspector, playback/scrubbing controls, and live preview on the canvas.
 
-Il codice sorgente identifica il modulo come **Animation Editor 1.6.11 – M5 Multi Object Linked Edit Fix**. Il `manifest.mf` contiene invece `OpenIDE-Module-Specification-Version: 1.6.8`; i due numeri sono quindi riportati separatamente perché appartengono a metadata differenti presenti nel progetto.
+The source code identifies the module as **Animation Editor 1.6.11 – M5 Multi Object Linked Edit Fix**. The `manifest.mf` file, however, still contains `OpenIDE-Module-Specification-Version: 1.6.8`. These values are therefore documented separately because they belong to different metadata found in the project.
 
-Il modulo usa Java 11 e si integra come finestra NetBeans `TopComponent` denominata **Animation Editor - SMIL**.
+The module targets Java 11 and integrates into the NetBeans Platform as a `TopComponent` window named **Animation Editor - SMIL**.
 
-## Modello di editing
+## Editing Model
 
-L'editor rappresenta le animazioni come:
+The editor represents animation through:
 
-- oggetti SVG;
-- tracce SMIL espandibili;
-- keyframe con tempo e valore;
-- playhead temporale;
-- inspector per proprietà, timing e composizione.
+- SVG objects;
+- expandable SMIL tracks;
+- keyframes containing time and value information;
+- a timeline playhead;
+- an inspector for properties, timing, and composition.
 
-`Timeline`, `TimelineModel` e `SMILTrack` separano la rappresentazione della timeline dalla logica DOM e dall'anteprima.
+`Timeline`, `TimelineModel`, and `SMILTrack` separate the timeline representation from DOM manipulation and preview logic.
 
-## Tipi di traccia authorabili
+## Authorable Track Types
 
-Il menu **Add Track** supporta direttamente:
+The **Add Track** menu directly supports the following categories.
 
-### Geometria
+### Geometry
 
 - `x`
 - `y`
@@ -35,7 +35,7 @@ Il menu **Add Track** supporta direttamente:
 - `height`
 - path `d`
 
-### Aspetto
+### Appearance
 
 - `opacity`
 - `fill`
@@ -44,12 +44,12 @@ Il menu **Add Track** supporta direttamente:
 - `stroke-opacity`
 - `stroke-width`
 
-### Stato
+### State
 
 - `visibility`
-- `set` per `x`, `y`, `opacity`, `fill`, `visibility`
+- `set` tracks for `x`, `y`, `opacity`, `fill`, and `visibility`
 
-### Trasformazioni
+### Transforms
 
 - `translate`
 - `scale`
@@ -59,122 +59,122 @@ Il menu **Add Track** supporta direttamente:
 
 ### Motion
 
-- `animateMotion` mediante **Motion Path**;
-- riferimento a un path tramite `<mpath>` e `href` / `xlink:href`;
-- path SVG inline direttamente nell'attributo `path`;
-- controllo della rotazione del moto;
-- gestione dell'anchor del motion.
+- `animateMotion` through **Motion Path**;
+- references to an existing path through `<mpath>` and `href` / `xlink:href`;
+- inline SVG path data stored directly in the `path` attribute;
+- motion rotation control;
+- motion anchor handling.
 
-### Tracce generiche
+### Generic Tracks
 
-- proprietà numeriche;
-- proprietà colore;
-- proprietà discrete.
+- numeric properties;
+- color properties;
+- discrete properties.
 
-Queste permettono di animare attributi non esposti come preset dedicati, mantenendo il modello SVG/SMIL standard.
+These generic tracks make it possible to animate SVG attributes that are not exposed as dedicated presets while still using standard SVG/SMIL structures.
 
-## Timing e composizione SMIL
+## SMIL Timing and Composition
 
-L'inspector gestisce le principali proprietà temporali e compositive, tra cui:
+The inspector handles the main timing and composition properties, including:
 
 - `begin`;
 - `end`;
-- durata;
+- duration;
 - `repeatCount`;
 - `repeatDur`;
 - `restart`;
 - `fill` (`freeze` / `remove`);
-- `calcMode`, inclusi `linear`, `discrete`, `paced` e `spline`;
+- `calcMode`, including `linear`, `discrete`, `paced`, and `spline`;
 - `keySplines`;
 - `additive` (`replace` / `sum`);
 - `accumulate` (`none` / `sum`).
 
-Il codice contiene inoltre parsing e risoluzione di espressioni temporali basate su clock, eventi e syncbase, oltre alla gestione di animazioni con durata o ripetizione indefinite.
+The code also contains parsing and resolution logic for clock-based, event-based, and syncbase timing expressions, as well as support for indefinite duration or repetition.
 
-## Keyframe e interpolazione
+## Keyframes and Interpolation
 
-L'editor permette di aggiungere, spostare e rimuovere keyframe e valuta le tracce durante scrub e playback. Il runtime interno comprende logica per:
+The editor can add, move, and remove keyframes and evaluate track values during scrubbing and playback. Its internal runtime includes logic for:
 
-- interpolazione numerica;
-- interpolazione colore;
+- numeric interpolation;
+- color interpolation;
 - `calcMode="discrete"`;
-- easing spline cubico;
-- tempi `paced` per trasformazioni;
-- morph di path `d` quando la topologia è compatibile;
-- composizione di valori additive/accumulate dove prevista.
+- cubic spline easing;
+- paced timing for transforms;
+- path `d` morphing when path topology is compatible;
+- additive and accumulated value composition where supported.
 
-## Trasformazioni e pivot
+## Transforms and Pivot Handling
 
-Per `rotate`, `scale`, `skewX` e `skewY`, le trasformazioni create dall'editor usano come pivot predefinito il **centro visuale locale dell'oggetto**.
+For `rotate`, `scale`, `skewX`, and `skewY`, transforms authored by the editor use the object's **local visual center** as the default pivot.
 
-Per mantenere il risultato portabile come SVG/SMIL standard, scale e skew possono essere accompagnati da `animateTransform` helper che realizzano la sequenza di traslazione al pivot, trasformazione e traslazione inversa. Gli helper restano nascosti dalla timeline, condividono il timing della traccia principale e vengono eliminati insieme ad essa.
+To keep the result portable as standard SVG/SMIL, scale and skew operations may be accompanied by helper `animateTransform` elements implementing the translate-to-pivot, transform, and translate-back sequence. These helpers remain hidden from the timeline, share the timing of the main track, and are removed together with it.
 
-`translate` non necessita di pivot.
+`translate` does not require a pivot.
 
 ## Motion Path
 
-Il motion authoring accetta:
+Motion authoring accepts:
 
-- `#id` o `id` di un path esistente, generando/aggiornando `<mpath>`;
-- dati SVG path inline che iniziano con un comando di path, salvati nell'attributo `path` di `<animateMotion>`.
+- `#id` or `id` references to an existing path, creating or updating an `<mpath>` element;
+- inline SVG path data beginning with a valid path command, stored in the `path` attribute of `<animateMotion>`.
 
-Il codice mantiene anche la compatibilità tra `href` e `xlink:href` per i riferimenti `<mpath>`.
+The implementation also maintains compatibility with both `href` and `xlink:href` references on `<mpath>`.
 
-## Multi-object authoring
+## Multi-Object Authoring
 
-Quando sul canvas sono selezionati più oggetti, una nuova traccia può essere applicata a tutti i target in un'unica operazione nativa di Undo. La prima selezione viene quindi usata come riferimento per l'editing della timeline, mentre le tracce correlate possono essere mantenute sincronizzate durante l'authoring multi-oggetto.
+When multiple objects are selected on the canvas, a new track can be applied to all targets as one native Undo operation. The first selected object becomes the timeline editing reference, while related tracks can remain synchronized during multi-object authoring.
 
-## Anteprima e playback
+## Preview and Playback
 
-L'editor non si limita a modificare il DOM. Include un runtime di anteprima che aggiorna direttamente lo stato visuale Batik durante scrub e playback, con supporto per:
+The editor does more than modify the SVG DOM. It includes a preview runtime that updates Batik's rendered state directly during scrubbing and playback, with support for:
 
-- trasformazioni e motion;
-- geometria e path;
-- opacity e visibility;
-- fill e stroke;
-- proprietà generiche;
-- eventi SMIL;
-- playback con estensione della timeline quando necessario.
+- transforms and motion;
+- geometry and paths;
+- opacity and visibility;
+- fill and stroke;
+- generic properties;
+- SMIL events;
+- playback with timeline extension when required.
 
-Sono presenti controlli Play, Pause, Stop e Zoom della timeline.
+Play, Pause, Stop, Zoom In, and Zoom Out controls are included.
 
-## Ripristino dello stato statico
+## Restoring Static State
 
-Una parte importante del codice gestisce la cancellazione di una traccia attiva. Dopo la rimozione, l'editor ripristina immediatamente lo stato SVG statico/autoriale dell'oggetto e rivaluta le tracce rimaste al tempo corrente.
+An important part of the implementation handles deletion of an active animation track. After removal, the editor immediately restores the object's static authoring state and reevaluates the remaining tracks at the current time.
 
-Il ripristino copre trasformazioni, motion, geometria, path, opacity, visibility, fill/stroke e proprietà generiche, evitando che uno stato di preview Batik rimanga visivamente “bloccato” dopo la cancellazione della relativa animazione.
+Restoration covers transforms, motion, geometry, paths, opacity, visibility, fill/stroke, and generic properties, preventing a Batik preview state from remaining visually "stuck" after its animation is removed.
 
-## Undo / Redo e persistenza
+## Undo / Redo and Persistence
 
-Le operazioni di authoring sono integrate con l'Undo/Redo di Sketsa. Le animazioni create sono normali elementi SVG/SMIL (`<animate>`, `<animateTransform>`, `<animateMotion>`, `<set>`, `<mpath>`), quindi rimangono nel documento e possono essere salvate e riaperte senza dipendere da uno stato runtime proprietario dell'anteprima.
+Authoring operations are integrated with Sketsa's Undo/Redo system. Animations are stored as normal SVG/SMIL elements (`<animate>`, `<animateTransform>`, `<animateMotion>`, `<set>`, and `<mpath>`), so they remain part of the document and can be saved and reopened without depending on proprietary preview state.
 
-## Componenti principali
+## Main Components
 
-- `AnimationTopComponent.java` — finestra NetBeans, collegamento al documento e Undo/Redo globale.
-- `AnimationEditor.java` — UI principale, authoring, inspector, preview e playback.
-- `Timeline.java` — vista e interazione della timeline.
-- `TimelineModel.java` — modello ad albero di oggetti/tracce.
-- `SMILTrack.java` — astrazione di una traccia SMIL e dei relativi attributi/valori.
-- `TimingCellEditor.java`, `TimingCellRenderer.java`, `TimingHeaderRenderer.java`, `TimingValue.java` — editing e rendering del timing.
-- `NameCellRenderer.java` — rendering dei nomi nella timeline.
+- `AnimationTopComponent.java` — NetBeans window, document binding, and global Undo/Redo integration.
+- `AnimationEditor.java` — main UI, authoring logic, inspector, preview, and playback.
+- `Timeline.java` — timeline view and interaction.
+- `TimelineModel.java` — tree model for objects and tracks.
+- `SMILTrack.java` — abstraction for an SMIL track and its attributes/values.
+- `TimingCellEditor.java`, `TimingCellRenderer.java`, `TimingHeaderRenderer.java`, `TimingValue.java` — timing editing and rendering.
+- `NameCellRenderer.java` — timeline name rendering.
 
-## Test presenti nel progetto
+## Tests Included in the Project
 
-Il progetto include una suite di regressione M5 (`TESTS-1.6.11-M5-FULL-AUTHORING-EXPANSION.txt`) che copre:
+The project contains an M5 regression suite (`TESTS-1.6.11-M5-FULL-AUTHORING-EXPANSION.txt`) covering:
 
-- trasformazioni;
+- transforms;
 - visibility;
-- morph `d`;
-- proprietà numeriche, colore e discrete;
-- timing/composizione avanzati;
-- motion referenziato e inline;
-- authoring multi-oggetto;
-- portabilità SVG/SMIL;
-- regressioni delle milestone precedenti e casi reali di animazione.
+- path `d` morphing;
+- numeric, color, and discrete properties;
+- advanced timing and composition;
+- referenced and inline motion paths;
+- multi-object authoring;
+- SVG/SMIL portability;
+- previous milestone regressions and real-world animation cases.
 
-Le note fix-only documentano inoltre correzioni specifiche per cancellazione delle tracce, refresh dello stroke, pivot delle trasformazioni, visibility e motion authoring.
+The fix-only notes also document targeted corrections for track deletion, stroke refresh, transform pivots, visibility, and motion authoring.
 
-## Ambiente di riferimento
+## Reference Environment
 
 - Sketsa
 - NetBeans Platform

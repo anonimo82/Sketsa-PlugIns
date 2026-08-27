@@ -1,56 +1,56 @@
 # Sketsa Text on Path
 
-## Panoramica
+## Overview
 
-**Sketsa Text on Path** aggiunge a Sketsa un pannello per collegare un elemento di testo a un tracciato SVG mediante `<textPath>`, modificare il tracciato di riferimento e il `startOffset`, oppure rimuovere il collegamento mantenendo il contenuto testuale.
+**Sketsa Text on Path** adds a panel for attaching a text element to an SVG path through `<textPath>`, changing the referenced path and `startOffset`, or detaching the text while preserving its content.
 
-Il manifest dichiara il modulo `kiyut.sketsa.modules.textonpath` con specification version **0.1.1** e compilazione Java 11.
+The manifest declares the module `kiyut.sketsa.modules.textonpath` with specification version **0.1.1**, targeting Java 11.
 
-## Funzioni principali
+## Main Features
 
-- Collegamento di un singolo elemento `<text>` selezionato a un `<path>` identificato da ID.
-- Aggiornamento di un `<textPath>` già presente.
-- Modifica del valore `startOffset`.
-- Scrittura di `href` e `xlink:href` verso il path di riferimento.
-- Verifica che l'ID indicato esista davvero e corrisponda a un elemento `<path>`.
-- Detach del testo dal tracciato senza perdere nodi o contenuto testuale.
-- Riconoscimento automatico di una selezione che si trova già all'interno di un `<textPath>`.
+- Attach a single selected `<text>` element to a `<path>` identified by ID.
+- Update an existing `<textPath>`.
+- Change the `startOffset` value.
+- Write both `href` and `xlink:href` for the referenced path.
+- Verify that the requested ID exists and refers to an actual `<path>` element.
+- Detach text from the path without losing text nodes or content.
+- Automatically recognize a selection that is already inside a `<textPath>`.
 
-## Struttura SVG
+## SVG Structure
 
-Il collegamento prodotto è standard SVG:
+The generated link uses standard SVG markup:
 
 ```xml
 <text>
     <textPath href="#curve1"
               xlink:href="#curve1"
               startOffset="25%">
-        Testo sul tracciato
+        Text on the path
     </textPath>
 </text>
 ```
 
-Il valore di `startOffset` viene mantenuto come stringa SVG, quindi può rappresentare sia un valore numerico sia una percentuale valida per il documento.
+`startOffset` is preserved as an SVG string, so it can represent either a numeric value or a percentage valid for the document.
 
-## Strategia di aggiornamento
+## Update Strategy
 
-La versione 0.1.1 usa una strategia a **snapshot completi dell'elemento `<text>`**. Per Attach, Update e Detach viene costruita la nuova struttura, quindi il nodo `<text>` corrente viene sostituito con la nuova versione.
+Version 0.1.1 uses a **complete snapshot strategy for the `<text>` element**. For Attach, Update, and Detach operations, the new structure is built first and the current `<text>` node is then replaced with the new version.
 
-Questa scelta evita che una singola operazione logica venga frammentata in numerose piccole modifiche DOM e risolve sia l'aggiornamento visivo del `startOffset` sia l'isolamento delle operazioni Undo/Redo.
+This approach prevents one logical operation from being fragmented into many small DOM changes and solves both visual `startOffset` refresh issues and Undo/Redo isolation.
 
 ## Undo / Redo
 
-`TextSnapshotEdit` conserva lo stato precedente e quello successivo dell'intero `<text>`. L'edit viene inserito esplicitamente nella entry corrente del `DOMUndoManager`, così Attach/Update/Detach risultano ciascuno come un'unica operazione reversibile.
+`TextSnapshotEdit` stores the previous and next state of the entire `<text>` element. The edit is inserted explicitly into the current `DOMUndoManager` entry, so Attach, Update, and Detach each behave as a single reversible operation.
 
-Dopo la sostituzione il plugin aggiorna anche il riferimento all'elemento vivo e prova a ristabilirne la selezione sul canvas.
+After replacement, the plugin updates its reference to the live element and attempts to restore its selection on the canvas.
 
-## Sorgenti principali
+## Main Source Files
 
-- `src/kiyut/sketsa/modules/textonpath/integration/TextOnPathPanel.java` — UI, risoluzione del path, snapshot del testo e Undo/Redo.
-- `src/kiyut/sketsa/modules/textonpath/integration/TextOnPathIntegrator.java` — integrazione del pannello.
-- `src/kiyut/sketsa/modules/textonpath/Installer.java` — inizializzazione.
+- `src/kiyut/sketsa/modules/textonpath/integration/TextOnPathPanel.java` — UI, path resolution, text snapshots, and Undo/Redo.
+- `src/kiyut/sketsa/modules/textonpath/integration/TextOnPathIntegrator.java` — panel integration.
+- `src/kiyut/sketsa/modules/textonpath/Installer.java` — initialization.
 
-## Ambiente di riferimento
+## Reference Environment
 
 - Sketsa 9.1
 - NetBeans 11.3

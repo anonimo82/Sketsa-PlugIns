@@ -1,38 +1,38 @@
 # Sketsa Symbols
 
-## Panoramica
+## Overview
 
-**Sketsa Symbols** fornisce a Sketsa strumenti per creare definizioni SVG `<symbol>`, inserire istanze `<use>`, modificarle e trasformarle nuovamente in contenuto SVG indipendente.
+**Sketsa Symbols** provides tools for creating SVG `<symbol>` definitions, inserting and editing `<use>` instances, and converting instances back into independent SVG content.
 
-Il manifest identifica il modulo come `kiyut.sketsa.modules.symbols` con specification version **0.1.1**. Il progetto è compilato con Java 11.
+The manifest identifies the module as `kiyut.sketsa.modules.symbols` with specification version **0.1.1**. The project targets Java 11.
 
-## Funzioni principali
+## Main Features
 
-- Creazione di un `<symbol>` a partire dall'oggetto SVG selezionato.
-- Aggiornamento di una definizione `<symbol>` esistente con lo stesso ID.
-- Inserimento di nuove istanze `<use>` del simbolo.
-- Modifica di simbolo di riferimento e coordinate `x` / `y` di un `<use>` selezionato.
-- Distacco di una istanza `<use>` in contenuto SVG concreto, preservando la definizione `<symbol>` originale.
-- Creazione automatica di `<defs>` se il documento non ne possiede uno.
-- Gestione contemporanea di `href` e `xlink:href`.
+- Create a `<symbol>` from the selected SVG object.
+- Update an existing `<symbol>` definition with the same ID.
+- Insert new `<use>` instances of a symbol.
+- Edit the referenced symbol and the `x` / `y` coordinates of a selected `<use>`.
+- Detach a `<use>` instance into concrete SVG content while preserving the original `<symbol>` definition.
+- Automatically create `<defs>` when the document does not already contain one.
+- Handle both `href` and `xlink:href` references.
 
-## Creazione delle definizioni
+## Creating Definitions
 
-Quando viene creato un simbolo, il plugin **clona** l'elemento selezionato invece di spostarlo nel `<defs>`. L'eventuale `id` sul nodo clonato di primo livello viene rimosso per evitare un duplicato immediato con l'oggetto originale.
+When a symbol is created, the plugin **clones** the selected element instead of moving it into `<defs>`. Any `id` on the cloned top-level node is removed to avoid an immediate duplicate with the original object.
 
-La definizione risultante segue il modello:
+The resulting definition follows this model:
 
 ```xml
 <defs>
     <symbol id="mySymbol">
-        <!-- clone dell'oggetto originale -->
+        <!-- clone of the original object -->
     </symbol>
 </defs>
 ```
 
-## Istanze `<use>`
+## `<use>` Instances
 
-Le istanze create dal plugin usano entrambe le forme di riferimento:
+Instances created by the plugin use both reference forms:
 
 ```xml
 <use href="#mySymbol"
@@ -41,32 +41,32 @@ Le istanze create dal plugin usano entrambe le forme di riferimento:
      y="0" />
 ```
 
-Quando una definizione `<symbol>` viene creata, aggiornata, ripristinata con Undo o riapplicata con Redo, il plugin forza anche il refresh delle istanze `<use>` che la referenziano.
+When a `<symbol>` definition is created, updated, restored through Undo, or reapplied through Redo, the plugin also forces a refresh of the `<use>` instances that reference it.
 
-Questo comportamento è intenzionale: Batik può mantenere in cache il rendering di una reference già risolta anche quando il DOM della definizione è stato modificato. Riscrivere gli stessi riferimenti invalida quella cache e rende immediatamente visibile il nuovo simbolo.
+This behavior is intentional: Batik may cache the rendering of a resolved reference even after the definition DOM has changed. Rewriting the same references invalidates that cache and makes the updated symbol visible immediately.
 
 ## Detach
 
-**Detach Use** sostituisce una istanza con contenuto concreto derivato dalla definizione del simbolo. Le coordinate dell'istanza vengono conservate tramite una trasformazione di traslazione quando necessario. La definizione originale in `<defs>` non viene eliminata, quindi altre istanze restano valide.
+**Detach Use** replaces an instance with concrete content derived from the symbol definition. The instance coordinates are preserved through a translation transform when required. The original definition in `<defs>` is not deleted, so other instances remain valid.
 
 ## Undo / Redo
 
-Il sorgente contiene edit dedicati per:
+The source contains dedicated edits for:
 
-- modifica dello stato di un `<use>`;
-- inserimento di una nuova istanza;
-- detach di una istanza;
-- creazione o sostituzione della definizione `<symbol>`.
+- changing the state of a `<use>`;
+- inserting a new instance;
+- detaching an instance;
+- creating or replacing a `<symbol>` definition.
 
-Gli edit della definizione eseguono anche il refresh delle relative istanze dopo Undo e Redo.
+Definition edits also refresh related instances after Undo and Redo.
 
-## Sorgenti principali
+## Main Source Files
 
-- `src/kiyut/sketsa/modules/symbols/integration/SymbolsPanel.java` — gestione simboli e istanze, detach, refresh Batik e Undo/Redo.
-- `src/kiyut/sketsa/modules/symbols/integration/SymbolsIntegrator.java` — integrazione del pannello.
-- `src/kiyut/sketsa/modules/symbols/Installer.java` — inizializzazione.
+- `src/kiyut/sketsa/modules/symbols/integration/SymbolsPanel.java` — symbol and instance management, detach, Batik refresh, and Undo/Redo.
+- `src/kiyut/sketsa/modules/symbols/integration/SymbolsIntegrator.java` — panel integration.
+- `src/kiyut/sketsa/modules/symbols/Installer.java` — initialization.
 
-## Ambiente di riferimento
+## Reference Environment
 
 - Sketsa 9.1
 - NetBeans 11.3

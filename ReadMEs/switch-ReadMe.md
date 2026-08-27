@@ -1,42 +1,42 @@
 # Sketsa Switch
 
-## Panoramica
+## Overview
 
-**Sketsa Switch** aggiunge strumenti per creare e gestire elementi SVG `<switch>`, utili per contenuti alternativi selezionati in base a condizioni come `systemLanguage`.
+**Sketsa Switch** adds tools for creating and managing SVG `<switch>` elements, which are useful for alternative content selected according to conditions such as `systemLanguage`.
 
-Il modulo è identificato come `kiyut.sketsa.modules.switcher`; il manifest riporta specification version **0.2.6** e il progetto è configurato per Java 11.
+The module is identified as `kiyut.sketsa.modules.switcher`; the manifest reports specification version **0.2.6**, and the project targets Java 11.
 
-## Funzioni principali
+## Main Features
 
-Il pannello permette di:
+The panel can:
 
-- racchiudere un oggetto SVG selezionato in un nuovo `<switch>`;
-- aggiungere un oggetto come alternativa a uno `<switch>` esistente;
-- impostare o modificare l'attributo `systemLanguage` dell'alternativa selezionata;
-- rimuovere un'alternativa;
-- estrarre un'alternativa dal `<switch>` e reinserirla nel documento;
-- simulare una lingua per verificare quale alternativa dovrebbe risultare attiva;
-- sincronizzare il pannello con la selezione e con le modifiche DOM del documento.
+- wrap a selected SVG object inside a new `<switch>`;
+- add an object as an alternative to an existing `<switch>`;
+- set or edit the selected alternative's `systemLanguage` attribute;
+- remove an alternative;
+- extract an alternative from the `<switch>` and reinsert it into the document;
+- simulate a language to check which alternative should be active;
+- synchronize the panel with the current selection and DOM changes.
 
-## Gestione di `systemLanguage`
+## `systemLanguage` Editing
 
-La versione 0.2.6 introduce una protezione specifica per l'editing del campo lingua. Quando l'utente inizia a digitare, il campo viene marcato come **dirty** e la sincronizzazione automatica dal DOM viene temporaneamente sospesa.
+Version 0.2.6 introduces specific protection for editing the language field. When the user starts typing, the field is marked **dirty** and automatic synchronization from the DOM is temporarily suspended.
 
-In questo modo un timer di aggiornamento non può sovrascrivere il testo non ancora confermato. Premendo **Update Language**, il valore viene scritto nel DOM e lo stato dirty viene azzerato. Da quel momento Undo/Redo può nuovamente aggiornare il campo in base allo stato effettivo del documento.
+This prevents a periodic refresh timer from overwriting text that has not yet been committed. Pressing **Update Language** writes the value to the DOM and clears the dirty state. From that point onward, Undo/Redo can once again update the field according to the actual document state.
 
-Il cambio di selezione annulla invece l'eventuale valore non confermato e carica il `systemLanguage` dell'alternativa appena selezionata.
+Changing the selection discards any uncommitted field value and loads the `systemLanguage` of the newly selected alternative.
 
-## Struttura SVG
+## SVG Structure
 
-Il plugin opera su strutture standard come:
+The plugin works with standard structures such as:
 
 ```xml
 <switch>
     <g systemLanguage="it">
-        <!-- contenuto italiano -->
+        <!-- Italian content -->
     </g>
     <g systemLanguage="en">
-        <!-- contenuto inglese -->
+        <!-- English content -->
     </g>
     <g>
         <!-- fallback -->
@@ -44,23 +44,23 @@ Il plugin opera su strutture standard come:
 </switch>
 ```
 
-Quando un'alternativa viene estratta, il plugin rimuove `systemLanguage` dal nodo estratto e lo riposiziona fuori dallo `<switch>` mantenendone il contenuto.
+When an alternative is extracted, the plugin removes `systemLanguage` from the extracted node and moves it outside the `<switch>` while preserving its content.
 
 ## Undo / Redo
 
-Le modifiche strutturali vengono raggruppate tramite il `DOMUndoManager` di Sketsa. Creazione del contenitore, aggiunta/rimozione delle alternative, aggiornamento della lingua ed estrazione possono quindi partecipare alla normale cronologia Undo/Redo del documento.
+Structural changes are grouped through Sketsa's `DOMUndoManager`. Creating the container, adding/removing alternatives, updating the language, and extracting an alternative can therefore participate in the document's normal Undo/Redo history.
 
-## Integrazione con Sketsa
+## Sketsa Integration
 
-Il pannello usa il `VectorCanvas` attivo e ascolta la selezione corrente. Una sincronizzazione periodica mantiene coerenti interfaccia e DOM senza interferire con un valore `systemLanguage` ancora in fase di digitazione.
+The panel uses the active `VectorCanvas` and listens to the current selection. Periodic synchronization keeps the UI and DOM consistent without interfering with a `systemLanguage` value that is still being typed.
 
-## Sorgenti principali
+## Main Source Files
 
-- `src/kiyut/sketsa/modules/switcher/integration/SwitchPanel.java` — UI, gestione `<switch>`, simulazione lingua e Undo/Redo.
-- `src/kiyut/sketsa/modules/switcher/integration/SwitchIntegrator.java` — integrazione nell'interfaccia Sketsa.
-- `src/kiyut/sketsa/modules/switcher/Installer.java` — bootstrap del plugin.
+- `src/kiyut/sketsa/modules/switcher/integration/SwitchPanel.java` — UI, `<switch>` management, language simulation, and Undo/Redo.
+- `src/kiyut/sketsa/modules/switcher/integration/SwitchIntegrator.java` — integration into the Sketsa interface.
+- `src/kiyut/sketsa/modules/switcher/Installer.java` — plugin bootstrap.
 
-## Ambiente di riferimento
+## Reference Environment
 
 - Sketsa 9.1
 - NetBeans 11.3

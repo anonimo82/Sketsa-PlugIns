@@ -1,81 +1,81 @@
 # Sketsa Patterns
 
-## Panoramica
+## Overview
 
-**Sketsa Patterns** aggiunge a Sketsa un editor per creare e applicare pattern SVG come riempimento o tratto. Il progetto adotta un modello di **applicazione privata e immutabile**: il pannello serve come editor della bozza, mentre ogni applicazione effettiva crea una nuova definizione `<pattern>` indipendente.
+**Sketsa Patterns** adds an editor for creating and applying SVG patterns as fills or strokes. The project follows a **private, immutable application model**: the panel acts as a pattern draft editor, while every actual application creates a new independent `<pattern>` definition.
 
-Il manifest dichiara il modulo `kiyut.sketsa.modules.patterns` con specification version **0.3.0** e compilazione Java 11.
+The manifest declares the module `kiyut.sketsa.modules.patterns` with specification version **0.3.0**, targeting Java 11.
 
-## Tipi di pattern
+## Pattern Types
 
-Il pannello include generatori per:
+The panel includes generators for:
 
-- strisce verticali;
-- strisce orizzontali;
-- scacchiera;
-- punti;
-- pattern personalizzati o già esistenti.
+- vertical stripes;
+- horizontal stripes;
+- checkerboard patterns;
+- dots;
+- custom or already existing patterns.
 
-Per i pattern gestiti dal plugin sono disponibili due colori, dimensioni e posizione della cella, oltre a una modalità di coordinate assolute o relative.
+For patterns managed by the plugin, the editor provides two colors, cell size and position controls, and a choice between absolute and relative coordinate modes.
 
-## Coordinate e unità
+## Coordinates and Units
 
-Sono supportate due modalità:
+Two modes are supported:
 
-- **Absolute (SVG units)** — usa `patternUnits="userSpaceOnUse"` e valori SVG assoluti;
-- **Relative (%)** — usa `patternUnits="objectBoundingBox"` e valori relativi/percentuali.
+- **Absolute (SVG units)** — uses `patternUnits="userSpaceOnUse"` and absolute SVG values;
+- **Relative (%)** — uses `patternUnits="objectBoundingBox"` and relative/percentage values.
 
-Il pannello converte i valori mostrati quando si cambia modalità e visualizza un'anteprima del pattern in preparazione.
+The panel converts displayed values when switching modes and shows a preview of the pattern being prepared.
 
-## Modello di applicazione privata
+## Private Application Model
 
-Il comando **Create / Update** prepara la bozza del pattern, ma non modifica retroattivamente i pattern già applicati. Ogni **Apply Fill** o **Apply Stroke** crea invece una nuova definizione con ID univoco, per esempio `checker-1`, `checker-2`, `checker-3`.
+The **Create / Update** command prepares the current pattern draft but does not retroactively modify patterns that have already been applied. Each **Apply Fill** or **Apply Stroke** operation instead creates a new definition with a unique ID, such as `checker-1`, `checker-2`, or `checker-3`.
 
-Questa architettura evita un effetto collaterale tipico dei pattern condivisi: una modifica successiva nel pannello non può alterare accidentalmente oggetti che avevano ricevuto una versione precedente del pattern.
+This design avoids a common side effect of shared pattern definitions: later edits in the panel cannot accidentally change objects that were assigned an earlier version of the pattern.
 
-## Operazioni disponibili
+## Available Operations
 
-- Preparazione/modifica della bozza di pattern.
-- Applicazione del pattern come `fill`.
-- Applicazione del pattern come `stroke`.
-- Rimozione del pattern dal riempimento.
-- Rimozione del pattern dal tratto.
-- Rilevamento del pattern già usato dall'oggetto selezionato.
-- Lettura delle proprietà sia da stile CSS sia da attributi di presentazione SVG.
-- Creazione automatica di `<defs>` quando necessario.
+- Prepare or edit the pattern draft.
+- Apply the pattern as `fill`.
+- Apply the pattern as `stroke`.
+- Remove the pattern from the fill.
+- Remove the pattern from the stroke.
+- Detect the pattern already used by the selected object.
+- Read paint properties from either CSS style or SVG presentation attributes.
+- Create `<defs>` automatically when needed.
 
 ## Undo / Redo
 
-Le operazioni di applicazione usano edit dedicati per mantenere insieme:
+Pattern application uses dedicated edits that keep together:
 
-1. la definizione `<pattern>` privata creata per quella specifica applicazione;
-2. lo stato precedente della proprietà `fill` o `stroke` dell'oggetto.
+1. the private `<pattern>` definition created for that specific application;
+2. the previous `fill` or `stroke` state of the target object.
 
-Undo rimuove quindi esattamente la definizione privata creata dall'operazione e ripristina il paint precedente; Redo ricrea entrambi gli aspetti.
+Undo therefore removes exactly the private definition created by the operation and restores the previous paint. Redo recreates both parts.
 
-## Struttura SVG
+## SVG Structure
 
-La struttura prodotta segue il modello SVG standard:
+The generated structure follows standard SVG conventions:
 
 ```xml
 <defs>
     <pattern id="checker-1" ...>
-        <!-- primitive SVG che compongono il pattern -->
+        <!-- SVG primitives composing the pattern -->
     </pattern>
 </defs>
 
 <rect fill="url(#checker-1)" ... />
 ```
 
-Le definizioni generate sono normali nodi SVG e rimangono nel documento salvato.
+Generated definitions are normal SVG nodes and remain part of the saved document.
 
-## Sorgenti principali
+## Main Source Files
 
-- `src/kiyut/sketsa/modules/patterns/integration/PatternsPanel.java` — editor, anteprima, generazione dei pattern, applicazione e Undo/Redo.
-- `src/kiyut/sketsa/modules/patterns/integration/PatternsIntegrator.java` — integrazione del pannello.
-- `src/kiyut/sketsa/modules/patterns/Installer.java` — inizializzazione.
+- `src/kiyut/sketsa/modules/patterns/integration/PatternsPanel.java` — editor, preview, pattern generation, application, and Undo/Redo.
+- `src/kiyut/sketsa/modules/patterns/integration/PatternsIntegrator.java` — panel integration.
+- `src/kiyut/sketsa/modules/patterns/Installer.java` — initialization.
 
-## Ambiente di riferimento
+## Reference Environment
 
 - Sketsa 9.1
 - NetBeans 11.3
