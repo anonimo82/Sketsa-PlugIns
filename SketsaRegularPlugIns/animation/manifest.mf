@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: kiyut.sketsa.modules.animation
+OpenIDE-Module-Layer: kiyut/sketsa/modules/animation/layer.xml
+OpenIDE-Module-Localizing-Bundle: kiyut/sketsa/modules/animation/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.6.12

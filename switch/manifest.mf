@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: kiyut.sketsa.modules.switcher
-OpenIDE-Module-Install: kiyut/sketsa/modules/switcher/Installer.class
-OpenIDE-Module-Localizing-Bundle: kiyut/sketsa/modules/switcher/Bundle.properties
-OpenIDE-Module-Specification-Version: 0.2.6

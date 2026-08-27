@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="kiyut.sketsa.modules.physics" default="netbeans" basedir=".">
+    <description>Builds the Sketsa Physics (Matter.js) proof-of-concept module.</description>
+    <import file="nbproject/build-impl.xml"/>
+</project>

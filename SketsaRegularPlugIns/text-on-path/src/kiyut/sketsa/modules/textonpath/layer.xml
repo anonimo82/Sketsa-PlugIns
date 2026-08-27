@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+    <folder name="Actions">
+        <folder name="Window">
+            <file name="kiyut-sketsa-modules-textonpath-integration-OpenTextOnPathPanelAction.instance">
+                <attr name="instanceClass" stringvalue="kiyut.sketsa.modules.textonpath.integration.OpenTextOnPathPanelAction"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Menu">
+        <folder name="Window">
+            <file name="kiyut-sketsa-modules-textonpath-integration-OpenTextOnPathPanelAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/kiyut-sketsa-modules-textonpath-integration-OpenTextOnPathPanelAction.instance"/>
+                <attr name="position" intvalue="210"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Windows2">
+        <folder name="Components">
+            <file name="TextOnPathTopComponent.settings" url="integration/TextOnPathTopComponent.settings"/>
+        </folder>
+        <folder name="Modes">
+            <folder name="bottomSlidingSide">
+                <file name="TextOnPathTopComponent.wstcref" url="integration/TextOnPathTopComponent.wstcref"/>
+            </folder>
+        </folder>
+    </folder>
+</filesystem>

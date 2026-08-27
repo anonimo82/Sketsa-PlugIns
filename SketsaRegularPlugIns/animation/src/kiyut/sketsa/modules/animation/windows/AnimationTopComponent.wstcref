@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tc-ref PUBLIC "-//NetBeans//DTD Top Component in Mode Properties 2.0//EN" "http://www.netbeans.org/dtds/tc-ref2_0.dtd">
+<tc-ref version="2.0" >
+    <module name="kiyut.sketsa.modules.animation" spec="1.6.12"/>
+    <tc-id id="AnimationTopComponent"/>
+    <state opened="true"/>
+</tc-ref>

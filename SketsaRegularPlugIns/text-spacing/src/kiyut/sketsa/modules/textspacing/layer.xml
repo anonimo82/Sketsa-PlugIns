@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+    <folder name="Actions">
+        <folder name="Window">
+            <file name="kiyut-sketsa-modules-textspacing-integration-OpenTextSpacingPanelAction.instance">
+                <attr name="instanceClass" stringvalue="kiyut.sketsa.modules.textspacing.integration.OpenTextSpacingPanelAction"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Menu">
+        <folder name="Window">
+            <file name="kiyut-sketsa-modules-textspacing-integration-OpenTextSpacingPanelAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/kiyut-sketsa-modules-textspacing-integration-OpenTextSpacingPanelAction.instance"/>
+                <attr name="position" intvalue="220"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Windows2">
+        <folder name="Components">
+            <file name="TextSpacingTopComponent.settings" url="integration/TextSpacingTopComponent.settings"/>
+        </folder>
+        <folder name="Modes">
+            <folder name="bottomSlidingSide">
+                <file name="TextSpacingTopComponent.wstcref" url="integration/TextSpacingTopComponent.wstcref"/>
+            </folder>
+        </folder>
+    </folder>
+</filesystem>

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><module codename="kiyut.sketsa.modules.animation">
-    <module_version install_time="1787647740850" last="true" origin="installer" specification_version="0.5.4">
-        <file crc="479179300" name="config/Modules/kiyut-sketsa-modules-animation.xml"/>
-        <file crc="2220886519" name="modules/kiyut-sketsa-modules-animation.jar"/>
-    </module_version>
-</module>
