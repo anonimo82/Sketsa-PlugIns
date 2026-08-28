@@ -3,4 +3,4 @@ OpenIDE-Module: kiyut.sketsa.modules.audio
 OpenIDE-Module-Layer: kiyut/sketsa/modules/audio/layer.xml
 OpenIDE-Module-Install: kiyut/sketsa/modules/audio/Installer.class
 OpenIDE-Module-Localizing-Bundle: kiyut/sketsa/modules/audio/Bundle.properties
-OpenIDE-Module-Specification-Version: 0.8.3
+OpenIDE-Module-Specification-Version: 0.16.3

@@ -3,6 +3,6 @@
 <settings version="1.0">
     <module name="kiyut.sketsa.modules.audio" spec="0.9.0"/>
     <instanceof class="org.openide.windows.TopComponent"/>
-    <instanceof class="kiyut.sketsa.modules.audio.integration.AudioTopComponent"/>
-    <instance class="kiyut.sketsa.modules.audio.integration.AudioTopComponent" method="getDefault"/>
+    <instanceof class="kiyut.sketsa.modules.audio.integration.AudioTreeTopComponent"/>
+    <instance class="kiyut.sketsa.modules.audio.integration.AudioTreeTopComponent" method="getDefault"/>
 </settings>

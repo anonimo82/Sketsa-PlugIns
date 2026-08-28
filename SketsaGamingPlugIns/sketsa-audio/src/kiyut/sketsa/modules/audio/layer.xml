@@ -6,6 +6,9 @@
             <file name="kiyut-sketsa-modules-audio-integration-OpenAudioPanelAction.instance">
                 <attr name="instanceClass" stringvalue="kiyut.sketsa.modules.audio.integration.OpenAudioPanelAction"/>
             </file>
+            <file name="kiyut-sketsa-modules-audio-integration-OpenAudioTreeAction.instance">
+                <attr name="instanceClass" stringvalue="kiyut.sketsa.modules.audio.integration.OpenAudioTreeAction"/>
+            </file>
         </folder>
     </folder>
     <folder name="Menu">
@@ -14,15 +17,21 @@
                 <attr name="originalFile" stringvalue="Actions/Window/kiyut-sketsa-modules-audio-integration-OpenAudioPanelAction.instance"/>
                 <attr name="position" intvalue="230"/>
             </file>
+            <file name="kiyut-sketsa-modules-audio-integration-OpenAudioTreeAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/kiyut-sketsa-modules-audio-integration-OpenAudioTreeAction.instance"/>
+                <attr name="position" intvalue="231"/>
+            </file>
         </folder>
     </folder>
     <folder name="Windows2">
         <folder name="Components">
             <file name="AudioTopComponent.settings" url="integration/AudioTopComponent.settings"/>
+            <file name="AudioTreeTopComponent.settings" url="integration/AudioTreeTopComponent.settings"/>
         </folder>
         <folder name="Modes">
             <folder name="bottomSlidingSide">
                 <file name="AudioTopComponent.wstcref" url="integration/AudioTopComponent.wstcref"/>
+                <file name="AudioTreeTopComponent.wstcref" url="integration/AudioTreeTopComponent.wstcref"/>
             </folder>
         </folder>
     </folder>
