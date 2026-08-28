@@ -3,4 +3,4 @@ OpenIDE-Module: kiyut.sketsa.modules.physics
 OpenIDE-Module-Layer: kiyut/sketsa/modules/physics/layer.xml
 OpenIDE-Module-Install: kiyut/sketsa/modules/physics/Installer.class
 OpenIDE-Module-Localizing-Bundle: kiyut/sketsa/modules/physics/Bundle.properties
-OpenIDE-Module-Specification-Version: 0.9.7
+OpenIDE-Module-Specification-Version: 0.9.8

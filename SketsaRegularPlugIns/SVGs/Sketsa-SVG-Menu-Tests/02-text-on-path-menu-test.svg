@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="280" viewBox="0 0 720 280">
+  <rect width="720" height="280" fill="#fafafa"/>
+  <path id="titleCurve" d="M70,180 Q360,20 650,180" fill="none" stroke="#bbb" stroke-width="2"/>
+  <path id="lowerWave" d="M70,220 C220,130 480,290 650,190" fill="none" stroke="#ddd" stroke-width="2"/>
+  <text id="textToAttach" x="60" y="70" font-family="sans-serif" font-size="24">Select this text, then choose a Path ID from the popup.</text>
+</svg>

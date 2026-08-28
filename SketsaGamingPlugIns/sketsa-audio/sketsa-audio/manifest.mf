@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: kiyut.sketsa.modules.audio
-OpenIDE-Module-Install: kiyut/sketsa/modules/audio/Installer.class
-OpenIDE-Module-Localizing-Bundle: kiyut/sketsa/modules/audio/Bundle.properties
-OpenIDE-Module-Specification-Version: 0.8.2

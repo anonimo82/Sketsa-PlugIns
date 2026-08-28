@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="280" viewBox="0 0 720 280">
+  <defs>
+    <symbol id="starSymbol" viewBox="0 0 100 100"><path d="M50,5 61,38 96,38 68,58 79,92 50,72 21,92 32,58 4,38 39,38Z" fill="#e5b52d"/></symbol>
+    <symbol id="badgeSymbol" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#5b8bd8"/><circle cx="50" cy="50" r="28" fill="white"/></symbol>
+    <symbol id="arrowSymbol" viewBox="0 0 100 100"><path d="M10,42h52V20l30,30-30,30V58H10Z" fill="#54a86b"/></symbol>
+  </defs>
+  <rect width="720" height="280" fill="#fafafa"/>
+  <text x="20" y="30" font-family="sans-serif" font-size="16">Symbols menu test: starSymbol, badgeSymbol, arrowSymbol</text>
+  <use href="#starSymbol" x="70" y="80" width="90" height="90"/>
+  <use href="#badgeSymbol" x="210" y="80" width="90" height="90"/>
+  <use href="#arrowSymbol" x="350" y="80" width="90" height="90"/>
+</svg>

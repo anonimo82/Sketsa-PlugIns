@@ -3,4 +3,4 @@ OpenIDE-Module: kiyut.sketsa.modules.input
 OpenIDE-Module-Layer: kiyut/sketsa/modules/input/layer.xml
 OpenIDE-Module-Install: kiyut/sketsa/modules/input/Installer.class
 OpenIDE-Module-Localizing-Bundle: kiyut/sketsa/modules/input/Bundle.properties
-OpenIDE-Module-Specification-Version: 0.8.1
+OpenIDE-Module-Specification-Version: 0.8.2

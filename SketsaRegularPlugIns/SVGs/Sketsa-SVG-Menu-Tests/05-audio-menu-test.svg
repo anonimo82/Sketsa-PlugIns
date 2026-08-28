@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="340" viewBox="0 0 720 340" data-sketsa-audio-bus-main-volume="1">
+  <rect width="720" height="340" fill="#fafafa"/>
+  <rect id="musicEmitter" x="80" y="90" width="170" height="90" rx="12" fill="#7656b5"
+        data-sketsa-audio-src="music.ogg" data-sketsa-audio-event-id="music-main" data-sketsa-audio-bus="music"/>
+  <circle id="sfxEmitter" cx="430" cy="135" r="48" fill="#d98539"
+          data-sketsa-audio-src="hit.wav" data-sketsa-audio-event-id="sfx-hit" data-sketsa-audio-bus="sfx"/>
+  <rect id="physicsTrigger" x="300" y="245" width="120" height="45" fill="#5e9c6d"
+        data-sketsa-physics-body="dynamic" data-sketsa-physics-event-id="player-collision"/>
+  <rect id="inputTrigger" x="470" y="245" width="120" height="45" fill="#4d78cc"
+        data-sketsa-input-action="jump"/>
+  <text x="20" y="30" font-family="sans-serif" font-size="16">Audio menu test: buses, event IDs, trigger sources/types/actions.</text>
+</svg>

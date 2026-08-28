@@ -1,1 +1,0 @@
-Sketsa Audio plugin development build for evaluation.
