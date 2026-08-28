@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: kiyut.sketsa.modules.symbols
-OpenIDE-Module-Layer: kiyut/sketsa/modules/symbols/layer.xml
-OpenIDE-Module-Install: kiyut/sketsa/modules/symbols/Installer.class
-OpenIDE-Module-Localizing-Bundle: kiyut/sketsa/modules/symbols/Bundle.properties
-OpenIDE-Module-Specification-Version: 0.1.3

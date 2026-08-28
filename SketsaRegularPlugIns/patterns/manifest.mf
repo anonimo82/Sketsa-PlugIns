@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: kiyut.sketsa.modules.patterns
-OpenIDE-Module-Layer: kiyut/sketsa/modules/patterns/layer.xml
-OpenIDE-Module-Install: kiyut/sketsa/modules/patterns/Installer.class
-OpenIDE-Module-Localizing-Bundle: kiyut/sketsa/modules/patterns/Bundle.properties
-OpenIDE-Module-Specification-Version: 0.3.1

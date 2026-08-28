@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: kiyut.sketsa.modules.textspacing
-OpenIDE-Module-Layer: kiyut/sketsa/modules/textspacing/layer.xml
-OpenIDE-Module-Install: kiyut/sketsa/modules/textspacing/Installer.class
-OpenIDE-Module-Localizing-Bundle: kiyut/sketsa/modules/textspacing/Bundle.properties
-OpenIDE-Module-Specification-Version: 0.3.5

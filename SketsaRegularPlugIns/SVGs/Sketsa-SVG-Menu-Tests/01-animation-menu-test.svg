@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" viewBox="0 0 720 300">
-  <rect width="720" height="300" fill="#f7f7f7"/>
-  <path id="motionPathWave" d="M60,210 C180,60 300,280 430,120 S620,80 670,210" fill="none" stroke="#777" stroke-width="3"/>
-  <path id="motionPathArc" d="M70,240 Q360,20 650,240" fill="none" stroke="#aaa" stroke-width="2" stroke-dasharray="8 6"/>
-  <circle id="animatedBall" cx="60" cy="70" r="18" fill="#4d78cc">
-    <animate attributeName="opacity" values="1;0.25;1" dur="2s" repeatCount="indefinite"/>
-  </circle>
-  <text x="20" y="28" font-family="sans-serif" font-size="16">Animation menu test: Repeat + Motion Path IDs</text>
-</svg>

@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: kiyut.sketsa.modules.textonpath
-OpenIDE-Module-Layer: kiyut/sketsa/modules/textonpath/layer.xml
-OpenIDE-Module-Install: kiyut/sketsa/modules/textonpath/Installer.class
-OpenIDE-Module-Localizing-Bundle: kiyut/sketsa/modules/textonpath/Bundle.properties
-OpenIDE-Module-Specification-Version: 0.1.3
