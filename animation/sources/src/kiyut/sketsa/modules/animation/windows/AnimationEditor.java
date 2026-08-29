@@ -84,6 +84,8 @@ public class AnimationEditor extends JPanel {
     private final PropertyChangeListener canvasPropertyChangeListener;
 
     private final JButton playButton = new JButton("▶");
+    private final JButton jumpStartButton = new JButton("|<");
+    private final JButton jumpEndButton = new JButton(">|");
     private final JButton addTrackButton = new JButton("+ Track");
     private final JButton addKeyButton = new JButton("+ Key");
     private final JButton deleteKeyButton = new JButton("− Key");
@@ -296,6 +298,8 @@ public class AnimationEditor extends JPanel {
         });
 
         playButton.addActionListener(e -> { if (paused) startPlayback(); else pausePlayback(); });
+        jumpStartButton.addActionListener(e -> jumpToStart());
+        jumpEndButton.addActionListener(e -> jumpToEnd());
         zoomInButton.addActionListener(e -> changeZoom(true));
         zoomOutButton.addActionListener(e -> changeZoom(false));
         addTrackButton.addActionListener(e -> showAddTrackMenu());
@@ -314,6 +318,8 @@ public class AnimationEditor extends JPanel {
         JToolBar bar = new JToolBar();
         bar.setFloatable(false);
         bar.add(playButton);
+        bar.add(jumpStartButton);
+        bar.add(jumpEndButton);
         bar.addSeparator();
         bar.add(addTrackButton);
         bar.add(addKeyButton);
@@ -2084,6 +2090,46 @@ public class AnimationEditor extends JPanel {
         setSliderSeconds(Math.min(current, max));
     }
 
+    private void jumpToStart() {
+        if (!paused) pausePlayback();
+        setSliderSeconds(0f);
+        setCurrentTime(0f);
+        refreshInspector();
+        timeline.repaint();
+    }
+
+    private float lastAuthoredInstantSeconds() {
+        float last = 0f;
+        java.util.List<SMILTrack> tracks = timeline.getTimelineModel().getTracks();
+        for (SMILTrack t : tracks) {
+            if (t == null) continue;
+            java.util.List<Float> keyTimes = t.getKeyTimes();
+            if (keyTimes == null || keyTimes.isEmpty()) continue;
+
+            /*
+             * Jump to the last actual key marker authored on the visible
+             * timeline, not to the timeline zoom/range and not merely to a
+             * track duration. getKeyTimes() also supplies the implicit evenly
+             * spaced keys used by SMIL values/from-to tracks.
+             */
+            Float kt = keyTimes.get(keyTimes.size() - 1);
+            if (kt != null) {
+                last = Math.max(last, kt.floatValue() * t.getDurationSeconds());
+            }
+        }
+        return last;
+    }
+
+    private void jumpToEnd() {
+        if (!paused) pausePlayback();
+        float end = lastAuthoredInstantSeconds();
+        if (end <= 0f) end = Math.max(0f, sliderSeconds());
+        setSliderSeconds(end);
+        setCurrentTime(end);
+        refreshInspector();
+        timeline.repaint();
+    }
+
     private boolean hasMotionTracks() {
         for (SMILTrack t : timeline.getTimelineModel().getTracks()) {
             if (t.isMotionTrack()) return true;
@@ -2247,7 +2293,85 @@ public class AnimationEditor extends JPanel {
             canvas.refresh();
             applyDocumentSMILPreview(seconds);
             canvas.repaint();
+
+            /*
+             * 1.6.24 - finite fill=freeze final-frame pinning.
+             *
+             * VectorCanvas.refresh() may rebuild the Batik GVT asynchronously.
+             * For a finite repeated animation exactly at/after its active end,
+             * Batik can therefore publish its native repeat-boundary geometry
+             * after the editor's authoritative local pass. The visible symptom
+             * is a fill=freeze object snapping away from its authored final
+             * value (e.g. x=800) even though normalizedTrackTime() correctly
+             * evaluates the frozen sample as 1.0.
+             *
+             * Only when at least one finite frozen animation has actually
+             * completed, schedule one EDT pass after the refresh has had a
+             * chance to publish its rebuilt nodes. Reacquiring the nodes inside
+             * applyDocumentSMILPreview() then pins the final frozen state on the
+             * current GVT rather than on the pre-refresh node.
+             */
+            if (hasCompletedFiniteFrozenTrack(seconds)) {
+                final float frozenSeconds = seconds;
+                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                    @Override public void run() {
+                        if (canvas == null) return;
+                        applyDocumentSMILPreview(frozenSeconds);
+                        canvas.repaint();
+                    }
+                });
+            }
         }
+    }
+
+    private boolean hasCompletedFiniteFrozenTrack(float seconds) {
+        if (canvas == null) return false;
+        try {
+            org.w3c.dom.svg.SVGDocument doc = canvas.getSVGDocument();
+            if (doc == null || doc.getDocumentElement() == null) return false;
+            return hasCompletedFiniteFrozenTrackRecursive(
+                    doc.getDocumentElement(), seconds);
+        } catch (RuntimeException ex) {
+            return false;
+        }
+    }
+
+    private boolean hasCompletedFiniteFrozenTrackRecursive(
+            Element element, float seconds) {
+        if (element == null) return false;
+
+        String local = localName(element);
+        if (isAnimationElementName(local)
+                && "freeze".equals(new SMILTrack(
+                        element,
+                        "animateTransform".equals(local)
+                                ? element.getAttribute("type")
+                                : element.getAttribute("attributeName"),
+                        local).getFillMode())) {
+            SMILTrack track = trackFromAnimationElement(element);
+            if (track != null) {
+                float begin = resolveBeginSeconds(track);
+                if (!Float.isNaN(begin)) {
+                    float dur = track.getDurationSeconds();
+                    float active = computeActiveDuration(track, dur, begin);
+                    if (!Float.isInfinite(active)
+                            && seconds + 0.00001f >= begin + active) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        org.w3c.dom.NodeList children = element.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            org.w3c.dom.Node n = children.item(i);
+            if (n instanceof Element
+                    && hasCompletedFiniteFrozenTrackRecursive(
+                            (Element)n, seconds)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean hasAnimateTransformChild(Element target) {
@@ -2599,6 +2723,7 @@ public class AnimationEditor extends JPanel {
         List<SMILTrack> transformTracks = new ArrayList<SMILTrack>();
         List<SMILTrack> motionTracks = new ArrayList<SMILTrack>();
         List<SMILTrack> visibilityTracks = new ArrayList<SMILTrack>();
+        List<SMILTrack> setVisibilityTracks = new ArrayList<SMILTrack>();
         List<SMILTrack> opacityTracks = new ArrayList<SMILTrack>();
         List<SMILTrack> pathTracks = new ArrayList<SMILTrack>();
         List<SMILTrack> genericAnimateTracks = new ArrayList<SMILTrack>();
@@ -2619,6 +2744,9 @@ public class AnimationEditor extends JPanel {
             } else if ("animate".equals(local)
                     && "visibility".equals(e.getAttribute("attributeName"))) {
                 visibilityTracks.add(new SMILTrack(e, "visibility", "animate"));
+            } else if ("set".equals(local)
+                    && "visibility".equals(e.getAttribute("attributeName"))) {
+                setVisibilityTracks.add(new SMILTrack(e, "Set visibility", "set"));
             } else if ("animate".equals(local)
                     && "opacity".equals(e.getAttribute("attributeName"))) {
                 opacityTracks.add(new SMILTrack(e, "opacity", "animate"));
@@ -2637,19 +2765,20 @@ public class AnimationEditor extends JPanel {
         if (transformTracks.isEmpty()
                 && motionTracks.isEmpty()
                 && visibilityTracks.isEmpty()
+                && setVisibilityTracks.isEmpty()
                 && opacityTracks.isEmpty()
                 && pathTracks.isEmpty()
                 && genericAnimateTracks.isEmpty()) return;
 
-        runtimeVisibilityTracks += visibilityTracks.size();
+        runtimeVisibilityTracks += visibilityTracks.size() + setVisibilityTracks.size();
         runtimeMotionTracks += motionTracks.size();
         runtimeOpacityTracks += opacityTracks.size();
         runtimeGenericAnimateTracks += genericAnimateTracks.size();
 
         GraphicsNode node = resolveRuntimeGraphicsNode(
-                target, !visibilityTracks.isEmpty());
+                target, !visibilityTracks.isEmpty() || !setVisibilityTracks.isEmpty());
         if (node == null) return;
-        if (!visibilityTracks.isEmpty()) runtimeVisibilityResolved += visibilityTracks.size();
+        if (!visibilityTracks.isEmpty() || !setVisibilityTracks.isEmpty()) runtimeVisibilityResolved += visibilityTracks.size() + setVisibilityTracks.size();
 
         if (!transformTracks.isEmpty() || !motionTracks.isEmpty()) {
             List<TransformOp> baseOps = documentBaseTransformOps.get(target);
@@ -2855,7 +2984,7 @@ public class AnimationEditor extends JPanel {
             }
         }
 
-        if (!visibilityTracks.isEmpty()) {
+        if (!visibilityTracks.isEmpty() || !setVisibilityTracks.isEmpty()) {
             Boolean baseVisible = documentBaseVisibility.get(target);
             if (baseVisible == null) {
                 String authored = target.getAttribute("visibility");
@@ -2868,6 +2997,22 @@ public class AnimationEditor extends JPanel {
             for (SMILTrack track : visibilityTracks) {
                 String value = evaluateGenericAnimateTrack(
                         track, seconds, target, "visibility");
+                if (value == null) continue;
+                visible = Boolean.valueOf(
+                        !"hidden".equals(value) && !"collapse".equals(value));
+            }
+
+            /*
+             * 1.6.26 - <set attributeName="visibility"> is a discrete
+             * visibility animation too. It must participate in the same GVT
+             * visibility adapter as <animate attributeName="visibility">.
+             * Apply set tracks after continuous visibility tracks so their
+             * active interval overrides the underlying/current value exactly
+             * as a discrete SMIL state. fill="remove" naturally restores the
+             * base/continuous visibility when evaluateSetTrack() returns null.
+             */
+            for (SMILTrack track : setVisibilityTracks) {
+                String value = evaluateSetTrack(track, seconds);
                 if (value == null) continue;
                 visible = Boolean.valueOf(
                         !"hidden".equals(value) && !"collapse".equals(value));
@@ -4365,11 +4510,14 @@ public class AnimationEditor extends JPanel {
 
         Double currentX = null;
         Double currentY = null;
+        boolean continuousGeometryX = false;
+        boolean continuousGeometryY = false;
         Double rotate = null;
         SMILTrack rotateTrack = null;
         Float opacity = null;
         Paint fillPaint = null;
         MotionSample motionSample = null;
+        SMILTrack motionTrack = null;
         Double setX = null;
         Double setY = null;
         Float setOpacity = null;
@@ -4377,6 +4525,7 @@ public class AnimationEditor extends JPanel {
 
         for (SMILTrack track : timeline.getTimelineModel().getTracks()) {
             if (track.isMotionTrack()) {
+                motionTrack = track;
                 motionSample = evaluateMotionTrack(track, seconds);
                 continue;
             }
@@ -4399,6 +4548,7 @@ public class AnimationEditor extends JPanel {
             if (value == null) continue;
             try {
                 if ("x".equals(track.getName())) {
+                    continuousGeometryX = true;
                     double v = Double.parseDouble(value.trim());
                     if ("sum".equals(track.getAdditive())) {
                         double base = currentX != null
@@ -4409,6 +4559,7 @@ public class AnimationEditor extends JPanel {
                     }
                 }
                 else if ("y".equals(track.getName())) {
+                    continuousGeometryY = true;
                     double v = Double.parseDouble(value.trim());
                     if ("sum".equals(track.getAdditive())) {
                         double base = currentY != null
@@ -4463,23 +4614,60 @@ public class AnimationEditor extends JPanel {
         double dx = currentX == null ? 0d : currentX.doubleValue() - previewBaseX;
         double dy = currentY == null ? 0d : currentY.doubleValue() - previewBaseY;
 
+        /*
+         * 1.6.25 - do not apply rect x/y animation twice.
+         *
+         * The document-wide runtime handles <animate attributeName="x|y"> on
+         * primitive rectangles by rebuilding the ShapeNode geometry at the
+         * evaluated absolute coordinate. The selected-target preview historically
+         * represented the same x/y value as a GraphicsNode translation. Running
+         * both paths together therefore produced:
+         *
+         *   geometry x=800 + transform translate(800-120) => visual x=1480
+         *
+         * which became especially visible after the 1.6.24 fill=freeze final
+         * pinning pass. For continuous rect geometry tracks, leave placement to
+         * the authoritative document-wide geometry adapter and keep the selected
+         * node's static transform only. <set> x/y is intentionally unchanged
+         * because it is still handled by the selected-target preview path.
+         */
+        if ("rect".equals(localName(target))) {
+            if (continuousGeometryX) dx = 0d;
+            if (continuousGeometryY) dy = 0d;
+        }
+
         AffineTransform tx = previewBaseTransform == null
                 ? new AffineTransform()
                 : new AffineTransform(previewBaseTransform);
 
         if (motionSample != null && previewBaseCenterValid) {
             /*
-             * Translate from the ORIGINAL object anchor to the sampled absolute
-             * SVG path point. Never use the current live-node bounds here.
+             * Imported/native SVG animateMotion uses the path as a motion
+             * transform. A path beginning at M0 0 therefore means zero
+             * translation at t=0; it must NOT be interpreted as an absolute
+             * placement point and compensated against the object's center.
+             *
+             * Editor-authored Center/Origin/Custom modes, on the other hand,
+             * deliberately treat the sampled point as an absolute anchor
+             * placement and retain the existing anchor compensation.
              */
-            tx.translate(
-                    motionSample.x - previewBaseCenterX,
-                    motionSample.y - previewBaseCenterY);
-            if (motionSample.rotate) {
-                tx.rotate(
-                        Math.toRadians(motionSample.angleDegrees),
-                        previewBaseCenterX,
-                        previewBaseCenterY);
+            boolean nativeMotion = motionTrack != null
+                    && "native".equals(motionAnchorMode(motionTrack));
+            if (nativeMotion) {
+                tx.translate(motionSample.x, motionSample.y);
+                if (motionSample.rotate) {
+                    tx.rotate(Math.toRadians(motionSample.angleDegrees));
+                }
+            } else {
+                tx.translate(
+                        motionSample.x - previewBaseCenterX,
+                        motionSample.y - previewBaseCenterY);
+                if (motionSample.rotate) {
+                    tx.rotate(
+                            Math.toRadians(motionSample.angleDegrees),
+                            previewBaseCenterX,
+                            previewBaseCenterY);
+                }
             }
         }
 
@@ -4914,7 +5102,24 @@ public class AnimationEditor extends JPanel {
         String motionPathId = track.getMotionPathId();
         if (motionPathId != null && !motionPathId.trim().isEmpty()) {
             Element pathElement = findElementById(documentRoot, motionPathId.trim());
-            if (pathElement != null) {
+            if (pathElement != null
+                    && !"native".equals(motionAnchorMode(track))) {
+                /*
+                 * Editor-authored Motion binds an already-positioned object to
+                 * a visible SVG path, so the referenced path geometry must be
+                 * converted into the target-parent user space.
+                 *
+                 * Imported/native SMIL is different: <mpath> supplies path
+                 * data for the animateMotion supplemental transform in the
+                 * target's current user coordinate system. Converting it via
+                 * the referenced path/root/parent CTMs incorrectly cancels
+                 * ancestor transforms (notably nested translate + scale on
+                 * <use> targets, as in TEST-Toy_train_SMIL.svg).
+                 *
+                 * Therefore native/unmarked animateMotion keeps the raw path
+                 * data coordinates. Parent transforms remain in the GVT tree
+                 * and are applied naturally after the motion transform.
+                 */
                 pts = convertReferencedMotionPoints(
                         pts, pathElement, target, documentRoot);
                 if (pts.size() < 2) return null;
@@ -5923,6 +6128,48 @@ public class AnimationEditor extends JPanel {
         }
     }
 
+    private boolean hasDirectAnimationChild(Element element) {
+        if (element == null) return false;
+        org.w3c.dom.NodeList children = element.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            org.w3c.dom.Node n = children.item(i);
+            if (!(n instanceof Element)) continue;
+            Element child = (Element)n;
+            String local = child.getLocalName();
+            if (local == null || local.isEmpty()) local = child.getTagName();
+            if ("animate".equals(local)
+                    || "animateTransform".equals(local)
+                    || "animateMotion".equals(local)
+                    || "set".equals(local)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void collectAnimatedTargetsRecursive(
+            Element element, java.util.List<Element> out, int limit) {
+        if (element == null || out == null || out.size() >= limit) return;
+        if (hasDirectAnimationChild(element)) {
+            out.add(element);
+            if (out.size() >= limit) return;
+        }
+        org.w3c.dom.NodeList children = element.getChildNodes();
+        for (int i = 0; i < children.getLength() && out.size() < limit; i++) {
+            org.w3c.dom.Node n = children.item(i);
+            if (n instanceof Element) {
+                collectAnimatedTargetsRecursive((Element)n, out, limit);
+            }
+        }
+    }
+
+    private Element resolveUniqueAnimatedDescendant(Element selected) {
+        if (selected == null || hasDirectAnimationChild(selected)) return selected;
+        java.util.List<Element> found = new java.util.ArrayList<Element>();
+        collectAnimatedTargetsRecursive(selected, found, 2);
+        return found.size() == 1 ? found.get(0) : selected;
+    }
+
     private Element findFirstAnimatedTargetRecursive(Element element) {
         if (element == null) return null;
 
@@ -5972,6 +6219,33 @@ public class AnimationEditor extends JPanel {
         timeline.setSVGElement((SVGElement)target);
         refreshInspector();
         updateButtons();
+    }
+
+    void refreshAfterUndoRedo() {
+        if (canvas == null) return;
+
+        final float stableSeconds = sliderSeconds();
+
+        /*
+         * Undo/Redo can rebuild animation DOM nodes and temporarily desync the
+         * timeline selection/inspector from the actual document state while
+         * focus remains inside the Animation window. Re-bind from the current
+         * canvas selection, fall back to the first animated target if needed,
+         * then re-apply the preview time on the next Swing turn.
+         */
+        restorePreviewBase();
+        updateTimeline(canvas.getCanvasSelection().getSelectionList());
+        bindInitialAnimatedTargetIfNeeded();
+
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            if (canvas == null) return;
+            updateTimeline(canvas.getCanvasSelection().getSelectionList());
+            bindInitialAnimatedTargetIfNeeded();
+            setCurrentTime(stableSeconds);
+            timeline.repaint();
+            refreshInspector();
+            updateButtons();
+        });
     }
 
     public void setVectorCanvas(VectorCanvas newCanvas) {
@@ -6070,7 +6344,8 @@ public class AnimationEditor extends JPanel {
         Element next = null;
         if (selectionList != null && selectionList.size() == 1
                 && selectionList.get(0) instanceof Element) {
-            next = (Element)selectionList.get(0);
+            next = resolveUniqueAnimatedDescendant(
+                    (Element)selectionList.get(0));
         }
 
         Element previous = selectedSVGElement();
@@ -6093,7 +6368,18 @@ public class AnimationEditor extends JPanel {
                 }
             }
         } else if (selectionList.size() == 1) {
-            timeline.setSVGElement(selectionList.get(0));
+            SVGElement selected = selectionList.get(0);
+            if (selected instanceof Element) {
+                Element resolved = resolveUniqueAnimatedDescendant(
+                        (Element)selected);
+                if (resolved instanceof SVGElement) {
+                    timeline.setSVGElement((SVGElement)resolved);
+                } else {
+                    timeline.setSVGElement(selected);
+                }
+            } else {
+                timeline.setSVGElement(selected);
+            }
         }
 
         refreshInspector();

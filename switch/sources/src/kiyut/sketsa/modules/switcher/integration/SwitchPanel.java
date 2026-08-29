@@ -10,6 +10,7 @@ import java.util.List;
 import java.lang.reflect.Field;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.ButtonGroup;
 import javax.swing.JRadioButton;
 import javax.swing.JLabel;
@@ -38,6 +39,9 @@ final class SwitchPanel extends JPanel {
     private static final String SVG_NS = "http://www.w3.org/2000/svg";
 
     private final JTextField languageField = new JTextField("en", 12);
+    private final JComboBox<String> alternativeCombo = new JComboBox<String>();
+    private final java.util.List<Element> alternativeElements =
+            new java.util.ArrayList<Element>();
 
     private final JRadioButton simEn = new JRadioButton("en");
     private final JRadioButton simIt = new JRadioButton("it");
@@ -87,6 +91,12 @@ final class SwitchPanel extends JPanel {
         c.anchor = GridBagConstraints.WEST;
 
         c.gridx = 0; c.gridy = 0;
+        add(new JLabel("Alternative:"), c);
+
+        c.gridx = 1; c.weightx = 1; c.fill = GridBagConstraints.HORIZONTAL;
+        add(alternativeCombo, c);
+
+        c.gridx = 0; c.gridy = 1; c.weightx = 0; c.fill = GridBagConstraints.NONE;
         add(new JLabel("systemLanguage:"), c);
 
         c.gridx = 1; c.weightx = 1; c.fill = GridBagConstraints.HORIZONTAL;
@@ -96,7 +106,7 @@ final class SwitchPanel extends JPanel {
         row1.add(wrapButton);
         row1.add(addAlternativeButton);
 
-        c.gridx = 0; c.gridy = 1; c.gridwidth = 2;
+        c.gridx = 0; c.gridy = 2; c.gridwidth = 2;
         c.weightx = 1; c.fill = GridBagConstraints.HORIZONTAL;
         add(row1, c);
 
@@ -105,7 +115,7 @@ final class SwitchPanel extends JPanel {
         row2.add(removeAlternativeButton);
         row2.add(extractButton);
 
-        c.gridy = 2;
+        c.gridy = 3;
         add(row2, c);
 
         ButtonGroup simGroup = new ButtonGroup();
@@ -123,13 +133,13 @@ final class SwitchPanel extends JPanel {
         simRow.add(simCustom);
         simRow.add(simCustomField);
 
-        c.gridy = 3;
+        c.gridy = 4;
         add(simRow, c);
 
-        c.gridy = 4;
+        c.gridy = 5;
         add(simulationResult, c);
 
-        c.gridy = 5;
+        c.gridy = 6;
         add(status, c);
 
         wrapButton.addActionListener(e -> wrapInSwitch());
@@ -137,6 +147,7 @@ final class SwitchPanel extends JPanel {
         updateConditionButton.addActionListener(e -> updateLanguage());
         removeAlternativeButton.addActionListener(e -> removeAlternative());
         extractButton.addActionListener(e -> extractFromSwitch());
+        alternativeCombo.addActionListener(e -> chooseAlternativeFromCombo());
 
         domSyncTimer = new javax.swing.Timer(250, e -> syncFromDOM());
         domSyncTimer.setRepeats(true);
@@ -212,7 +223,10 @@ final class SwitchPanel extends JPanel {
 
         if (canvas != null) {
             canvas.getCanvasSelection().addSelectionListener(selectionHandler);
+            refreshAlternativeChooser();
             cacheSelection();
+        } else {
+            refreshAlternativeChooser();
         }
 
         updateEnabledState();
@@ -228,20 +242,125 @@ final class SwitchPanel extends JPanel {
         return (n == null || n.isEmpty()) ? e.getTagName() : n;
     }
 
+    private Element uniqueSwitchInCurrentDocument() {
+        if (canvas == null) return null;
+        try {
+            org.w3c.dom.svg.SVGDocument doc = canvas.getSVGDocument();
+            if (doc == null) return null;
+            org.w3c.dom.NodeList switches =
+                    doc.getElementsByTagNameNS(SVG_NS, "switch");
+            if (switches.getLength() == 0) {
+                switches = doc.getElementsByTagName("switch");
+            }
+            if (switches.getLength() != 1) return null;
+            Node n = switches.item(0);
+            return n instanceof Element ? (Element)n : null;
+        } catch (RuntimeException ex) {
+            return null;
+        }
+    }
+
+    private void refreshAlternativeChooser() {
+        loading = true;
+        try {
+            alternativeElements.clear();
+            alternativeCombo.removeAllItems();
+
+            Element sw = uniqueSwitchInCurrentDocument();
+            if (sw == null) {
+                alternativeCombo.setEnabled(false);
+                return;
+            }
+
+            int index = 1;
+            for (Node n = sw.getFirstChild(); n != null; n = n.getNextSibling()) {
+                if (!(n instanceof Element)) continue;
+                Element child = (Element)n;
+                alternativeElements.add(child);
+
+                String id = child.getAttribute("id");
+                String lang = child.getAttribute("systemLanguage");
+                StringBuilder label = new StringBuilder();
+                label.append(index).append(": ");
+                if (id != null && !id.trim().isEmpty()) {
+                    label.append("#").append(id.trim());
+                } else {
+                    label.append("<").append(localName(child)).append(">");
+                }
+                label.append(" — ");
+                if (lang == null || lang.trim().isEmpty()) label.append("fallback");
+                else label.append("systemLanguage=").append(lang.trim());
+                alternativeCombo.addItem(label.toString());
+                index++;
+            }
+
+            alternativeCombo.setEnabled(!alternativeElements.isEmpty());
+
+            if (!alternativeElements.isEmpty()) {
+                int selectedIndex = alternativeElements.indexOf(cachedElement);
+                if (selectedIndex < 0) selectedIndex = 0;
+                alternativeCombo.setSelectedIndex(selectedIndex);
+            }
+        } finally {
+            loading = false;
+        }
+    }
+
+    private void chooseAlternativeFromCombo() {
+        if (loading) return;
+        int index = alternativeCombo.getSelectedIndex();
+        if (index < 0 || index >= alternativeElements.size()) return;
+
+        restoreSimulation();
+        cachedElement = alternativeElements.get(index);
+        cachedSelected = cachedElement instanceof SVGElement
+                ? (SVGElement)cachedElement : null;
+        loadFromSelection();
+        updateEnabledState();
+    }
+
     private void cacheSelection() {
         if (canvas == null) return;
 
         List<SVGElement> list = canvas.getCanvasSelection().getSelectionList();
 
+        refreshAlternativeChooser();
+
         if (list == null || list.size() != 1) {
-            cachedSelected = null;
-            cachedElement = null;
+            if (!alternativeElements.isEmpty()) {
+                cachedElement = alternativeElements.get(
+                        Math.max(0, alternativeCombo.getSelectedIndex()));
+                cachedSelected = cachedElement instanceof SVGElement
+                        ? (SVGElement)cachedElement : null;
+                loadFromSelection();
+            } else {
+                cachedSelected = null;
+                cachedElement = null;
+            }
             updateEnabledState();
             return;
         }
 
-        cachedSelected = list.get(0);
-        cachedElement = asElement(cachedSelected);
+        SVGElement selectedSvg = list.get(0);
+        Element selectedElement = asElement(selectedSvg);
+        boolean useful = selectedElement != null
+                && ("switch".equals(localName(selectedElement))
+                    || parentSwitch(selectedElement) != null);
+
+        if (useful) {
+            cachedSelected = selectedSvg;
+            cachedElement = selectedElement;
+            refreshAlternativeChooser();
+        } else if (!alternativeElements.isEmpty()) {
+            int index = alternativeCombo.getSelectedIndex();
+            if (index < 0) index = 0;
+            cachedElement = alternativeElements.get(index);
+            cachedSelected = cachedElement instanceof SVGElement
+                    ? (SVGElement)cachedElement : null;
+        } else {
+            cachedSelected = selectedSvg;
+            cachedElement = selectedElement;
+        }
 
         loadFromSelection();
         updateEnabledState();
@@ -256,16 +375,57 @@ final class SwitchPanel extends JPanel {
         return null;
     }
 
+    private Element uniqueDocumentSwitch(Element selected) {
+        if (selected == null) return null;
+        String local = localName(selected);
+        if (!"svg".equals(local)) return null;
+
+        Document doc = selected.getOwnerDocument();
+        if (doc == null) return null;
+
+        org.w3c.dom.NodeList switches =
+                doc.getElementsByTagNameNS(SVG_NS, "switch");
+        if (switches.getLength() == 0) {
+            switches = doc.getElementsByTagName("switch");
+        }
+        if (switches.getLength() != 1) return null;
+
+        Node n = switches.item(0);
+        return n instanceof Element ? (Element)n : null;
+    }
+
+    private boolean resolveDocumentSelectionToAlternative() {
+        Element sw = uniqueDocumentSwitch(cachedElement);
+        if (sw == null) return false;
+
+        Element first = firstElementChild(sw);
+        if (first == null) return false;
+
+        cachedElement = first;
+        if (first instanceof SVGElement) {
+            cachedSelected = (SVGElement) first;
+        }
+        return true;
+    }
+
     private void loadFromSelection() {
         if (cachedElement == null) return;
+
+        boolean resolvedFromDocument = resolveDocumentSelectionToAlternative();
 
         loading = true;
         try {
             Element sw = parentSwitch(cachedElement);
 
             if (sw != null) {
+                int chooserIndex = alternativeElements.indexOf(cachedElement);
+                if (chooserIndex >= 0 && alternativeCombo.getSelectedIndex() != chooserIndex) {
+                    alternativeCombo.setSelectedIndex(chooserIndex);
+                }
                 languageField.setText(cachedElement.getAttribute("systemLanguage"));
-                status.setText("Selected switch alternative.");
+                status.setText(resolvedFromDocument
+                        ? "Selected switch alternative (resolved from document selection)."
+                        : "Selected switch alternative.");
             } else if ("switch".equals(localName(cachedElement))) {
                 languageField.setText("");
                 status.setText("Selected <switch> container.");
@@ -321,6 +481,7 @@ final class SwitchPanel extends JPanel {
         boolean selectedSwitch = selected && "switch".equals(localName(cachedElement));
         boolean alternative = selected && parentSwitch(cachedElement) != null;
 
+        alternativeCombo.setEnabled(!alternativeElements.isEmpty());
         languageField.setEnabled(selected);
 
         wrapButton.setEnabled(selected && !selectedSwitch && !alternative);
