@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="560" viewBox="0 0 800 560">
+  <rect width="800" height="560" fill="#f4f4f4"/>
+  <text x="25" y="28" font-size="18">M4 composition + advanced interpolation</text>
+
+  <!-- A additive numeric: underlying x=40 + animated contribution 0..160 -->
+  <rect x="40" y="65" width="35" height="24" fill="#e53935">
+    <animate attributeName="x" from="0" to="160" dur="4s"
+             additive="sum" fill="freeze"/>
+  </rect>
+
+  <!-- B two additive animations same attribute: 40 + A + B -->
+  <rect x="40" y="120" width="35" height="24" fill="#1e88e5">
+    <animate attributeName="x" from="0" to="100" dur="4s"
+             additive="sum" fill="freeze"/>
+    <animate attributeName="x" from="0" to="80" dur="4s"
+             additive="sum" fill="freeze"/>
+  </rect>
+
+  <!-- C accumulate numeric: +70 each repeat -->
+  <circle cx="70" cy="200" r="15" fill="#43a047">
+    <animate attributeName="cx" from="70" to="140" dur="1s"
+             repeatCount="4" accumulate="sum" fill="freeze"/>
+  </circle>
+
+  <!-- D paced: 0->20 short, 20->220 long. Middle key should occur early. -->
+  <circle cx="70" cy="260" r="15" fill="#8e24aa">
+    <animate attributeName="cx" values="70;90;290"
+             calcMode="paced" dur="4s" fill="freeze"/>
+  </circle>
+
+  <!-- E from+by transform -->
+  <g transform="translate(390,75)">
+    <rect x="-18" y="-12" width="36" height="24" fill="#fb8c00"/>
+    <animateTransform attributeName="transform" type="translate"
+                      from="390 75" by="160 0" dur="4s" fill="freeze"/>
+  </g>
+
+  <!-- F additive same-type transforms -->
+  <g transform="translate(390,150)">
+    <rect x="-18" y="-12" width="36" height="24" fill="#00897b"/>
+    <animateTransform attributeName="transform" type="translate"
+                      from="0 0" to="100 0" additive="sum"
+                      dur="4s" fill="freeze"/>
+    <animateTransform attributeName="transform" type="translate"
+                      from="0 0" to="0 80" additive="sum"
+                      dur="4s" fill="freeze"/>
+  </g>
+
+  <!-- G accumulate transform -->
+  <g transform="translate(390,270)">
+    <path d="M-16 10 L16 10 L0 -24 Z" fill="#3949ab"/>
+    <animateTransform attributeName="transform" type="rotate"
+                      from="0" to="45" dur="1s" repeatCount="4"
+                      accumulate="sum" additive="sum" fill="freeze"/>
+  </g>
+
+  <!-- H paced transform values: short then long segment -->
+  <g transform="translate(390,360)">
+    <rect x="-14" y="-10" width="28" height="20" fill="#d81b60"/>
+    <animateTransform attributeName="transform" type="translate"
+                      values="0 0;20 0;220 0"
+                      calcMode="paced" additive="sum"
+                      dur="4s" fill="freeze"/>
+  </g>
+
+  <!-- I Motion + Transform composition -->
+  <path id="m4route" d="M70 470 C220 400 350 530 520 450"
+        fill="none" stroke="#9e9e9e" stroke-width="2"/>
+  <path d="M-12 -7 L12 -7 L0 -30 Z" fill="#6d4c41">
+    <animateTransform attributeName="transform" type="scale"
+                      from="1" to="1.8" dur="4s" repeatCount="indefinite"/>
+    <animateMotion dur="4s" repeatCount="indefinite" rotate="auto">
+      <mpath href="#m4route"/>
+    </animateMotion>
+  </path>
+</svg>

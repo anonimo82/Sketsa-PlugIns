@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240">
+  <path d="M40 120 A80 45 0 0 1 280 120"
+        fill="none" stroke="#2060a0" stroke-width="8">
+    <animate attributeName="d"
+             dur="4s"
+             repeatCount="indefinite"
+             calcMode="spline"
+             keyTimes="0;0.5;1"
+             keySplines="0.42 0 0.58 1;0.42 0 0.58 1"
+             values="
+               M40 120 A80 45 0 0 1 280 120;
+               M40 120 A125 95 35 1 1 280 120;
+               M40 120 A80 45 0 0 1 280 120"/>
+  </path>
+</svg>

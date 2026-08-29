@@ -1,55 +1,157 @@
-# Animation — Sketsa Plug-in
+# Sketsa Animation Editor
 
-Version: **1.6.19**  
-Reference platform: **Sketsa SVG Editor 9.1 / NetBeans Platform 11.3**  
-Java target: **Java 11+**
+## Overview
 
-## Contents
+Sketsa Animation Editor is a Java/NetBeans module for authoring SVG/SMIL animation directly inside Sketsa 9.1. It provides a dedicated **independent NetBeans TopComponent window**, comparable to a normal editor/tool window rather than an extension embedded into Sketsa's Properties pane. The window can be docked, moved, resized, closed and reopened from the **Window** menu.
 
-- `sources/` — complete NetBeans module source project.
-- `animation-1.6.19.nbm` — installable NBM built from this source revision.
-- `README.md` — this file.
+The editor is designed around SVG objects, expandable animation tracks, keyframes, a timeline playhead and an inspector. All authored animation is stored as standard SVG/SMIL markup, so saved documents remain portable and do not depend on a proprietary project format.
 
-## Plug-in summary
+This repository build is version **1.6.21**. It preserves the 1.6.11 authoring feature set and standardizes the repository documentation/licensing while keeping the independent Animation window model.
 
-- SMIL animation editor.
-- Contextual suggestions for Repeat, RepeatDur, and Motion Path.
-- Motion Path suggestions are populated from path IDs in the current SVG document.
+## User interface
 
-## Undo / Redo status
+The Animation window contains:
 
-Validated in user testing.
+- timeline object rows and expandable animation tracks;
+- keyframe editing;
+- Play, Pause and Stop controls;
+- Zoom In and Zoom Out controls;
+- a time slider/playhead;
+- a timing/property inspector;
+- scrollable timeline and inspector areas;
+- live preview on the active Sketsa canvas.
 
-## Contextual value menus
+The component follows the active `SVGEditorCookie`, integrates with Sketsa Undo/Redo and persists as a NetBeans window.
 
-This plug-in includes contextual pop-up suggestions where appropriate. Suggestions may be static, dynamic, or mixed. Dynamic entries are read from the currently open SVG document at the time the menu is opened. The affected fields remain manually editable; the menu is an aid, not a restriction.
+## Authorable track types
 
-## Installation
+### Geometry
 
-Install `animation-1.6.19.nbm` using the Sketsa 9.1 plug-in/module manager.
+- `x`
+- `y`
+- `cx`
+- `cy`
+- `r`
+- `width`
+- `height`
+- path `d`
 
-## Building from source
+### Appearance
 
-The module uses the NetBeans module build system. The reference build environment used during verification was:
+- `opacity`
+- `fill`
+- `fill-opacity`
+- `stroke`
+- `stroke-opacity`
+- `stroke-width`
 
-- Sketsa SVG Editor 9.1 as the NetBeans platform;
-- NetBeans 11.3 harness;
-- Java 11;
-- Ant.
+### State
 
-If `sources/nbproject/platform.properties` contains machine-specific paths, update or override them so they point to your local Sketsa 9.1 installation and NetBeans harness before building.
+- `visibility`
+- `set` tracks for `x`, `y`, `opacity`, `fill` and `visibility`
 
-Typical target:
+### Transforms
 
-```text
-ant clean nbm
-```
+- translate
+- scale
+- rotate
+- skewX
+- skewY
 
-## Regression check
+### Motion
 
-1. Open or create a compatible SVG document.
-2. Select an element supported by this plug-in.
-3. Change a plug-in value and commit/apply it if required.
-4. Run Undo and verify that only the plug-in change is reverted.
-5. Run Redo and verify that the new value is restored.
-6. Where contextual menus exist, add/remove compatible IDs or resources and verify that the menu reflects the current document.
+- `animateMotion`
+- referenced paths through `<mpath>`
+- `href` and `xlink:href` compatibility
+- inline SVG path data
+- motion rotation
+- motion anchor controls
+
+### Generic tracks
+
+The editor also supports generic numeric, color and discrete animation tracks, allowing SVG attributes that are not represented by a dedicated preset to be animated through normal SMIL structures.
+
+## Timing and composition
+
+The inspector supports the principal SMIL timing/composition attributes:
+
+- `begin`
+- `end`
+- duration
+- `repeatCount`
+- `repeatDur`
+- `restart`
+- `fill`
+- `calcMode`
+- `keySplines`
+- `additive`
+- `accumulate`
+
+The implementation contains handling for clock values, event timing, syncbase timing and indefinite timing where applicable.
+
+## Keyframes and interpolation
+
+The editor can create, move and delete keyframes and evaluate values during scrubbing/playback. The preview path includes support for:
+
+- numeric interpolation;
+- color interpolation;
+- discrete mode;
+- cubic spline easing;
+- paced timing;
+- compatible path-`d` morphing;
+- transform composition;
+- additive/accumulated values where supported by the track.
+
+## Transform pivots and motion paths
+
+Rotate, scale and skew authoring use the object's local visual center as the default pivot. Where necessary, helper `animateTransform` elements reproduce pivot translation using portable SMIL. Helper tracks share the timing of their owning track and are removed with it.
+
+Motion paths may reference an existing path by ID or store inline path data. Both modern `href` and legacy `xlink:href` forms are handled.
+
+## Multi-object authoring
+
+When multiple SVG objects are selected, track creation can target all selected objects as one logical authoring operation. The first selection acts as the timeline editing reference while related tracks can be authored together.
+
+## Preview, cleanup and persistence
+
+The preview runtime updates Batik-rendered state during playback/scrubbing. Removing an active animation restores the underlying static authoring state so the canvas does not remain visually stuck on a preview value.
+
+Authored animation is persisted as normal SVG/SMIL elements such as:
+
+- `<animate>`
+- `<animateTransform>`
+- `<animateMotion>`
+- `<set>`
+- `<mpath>`
+
+## Undo / Redo
+
+Animation authoring is integrated with Sketsa's Undo/Redo infrastructure. The module also exposes the active document Undo/Redo through its TopComponent.
+
+## Important source files
+
+- `windows/AnimationTopComponent.java` — independent NetBeans window and active-document binding.
+- `windows/AnimationEditor.java` — main UI, inspector, authoring and preview logic.
+- `timeline/Timeline.java` — visual timeline.
+- `timeline/TimelineModel.java` — object/track hierarchy.
+- `timeline/SMILTrack.java` — SMIL track abstraction.
+- timing cell editor/renderer classes — timing UI.
+
+## Included tests
+
+The project contains multiple SVG tests and the M5 regression suite covering transforms, visibility, path morphing, generic animation, timing/composition, motion paths, multi-object authoring and real-world SMIL documents.
+
+## Requirements
+
+- Sketsa SVG Editor 9.1
+- Apache NetBeans 11.3
+- JDK 11
+- Sketsa/NetBeans platform registered as described in the repository-level `BUILDING.md`
+
+## Building
+
+See the repository-level [`BUILDING.md`](../../BUILDING.md). In NetBeans use **Clean and Build**, then **Create NBM**.
+
+## License
+
+Apache License 2.0. See [`LICENSE`](LICENSE). The project also retains separate notices/licenses for third-party icon resources under `legal/`.

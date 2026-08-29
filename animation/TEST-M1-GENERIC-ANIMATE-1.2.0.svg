@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420">
+  <rect width="640" height="420" fill="#f4f4f4"/>
+
+  <!-- Numeric geometry + color + fill-opacity -->
+  <circle cx="80" cy="85" r="26" fill="#e53935" fill-opacity="1">
+    <animate attributeName="cx" dur="4s" repeatCount="indefinite" values="80;260;80" keyTimes="0;0.5;1"/>
+    <animate attributeName="r" dur="4s" repeatCount="indefinite" from="26" to="46"/>
+    <animate attributeName="fill" dur="4s" repeatCount="indefinite" values="#e53935;#1e88e5;#43a047" keyTimes="0;0.5;1"/>
+    <animate attributeName="fill-opacity" dur="4s" repeatCount="indefinite" values="1;0.25;1" keyTimes="0;0.5;1"/>
+  </circle>
+
+  <!-- to-only underlying-value semantics + width/height/y -->
+  <rect x="340" y="45" width="90" height="70" rx="8" fill="#8e24aa">
+    <animate attributeName="x" dur="4s" repeatCount="indefinite" to="500"/>
+    <animate attributeName="y" dur="4s" repeatCount="indefinite" values="45;90;45"/>
+    <animate attributeName="width" dur="4s" repeatCount="indefinite" values="90;130;90"/>
+    <animate attributeName="height" dur="4s" repeatCount="indefinite" by="40"/>
+  </rect>
+
+  <!-- Stroke color / width / opacity / discrete strings -->
+  <line x1="70" y1="220" x2="250" y2="220"
+        stroke="#111111" stroke-width="6" stroke-linecap="butt">
+    <animate attributeName="x2" dur="3s" repeatCount="indefinite" values="250;300;250"/>
+    <animate attributeName="stroke" dur="3s" repeatCount="indefinite" values="#111111;#ff6f00;#111111"/>
+    <animate attributeName="stroke-width" dur="3s" repeatCount="indefinite" from="6" by="16"/>
+    <animate attributeName="stroke-opacity" dur="3s" repeatCount="indefinite" values="1;0.3;1"/>
+    <animate attributeName="stroke-linecap" dur="3s" repeatCount="indefinite"
+             calcMode="discrete" values="butt;round;square" keyTimes="0;0.33;0.66"/>
+  </line>
+
+  <!-- Ellipse geometry + spline -->
+  <ellipse cx="430" cy="235" rx="50" ry="28" fill="#00897b">
+    <animate attributeName="rx" dur="4s" repeatCount="indefinite"
+             calcMode="spline" values="50;105;50" keyTimes="0;0.5;1"
+             keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+    <animate attributeName="ry" dur="4s" repeatCount="indefinite"
+             values="28;55;28" keyTimes="0;0.5;1"/>
+  </ellipse>
+
+  <!-- Existing specialized generic types must still work -->
+  <circle cx="120" cy="345" r="28" fill="#3949ab" opacity="1">
+    <animate attributeName="opacity" dur="2s" repeatCount="indefinite" values="1;0.15;1"/>
+  </circle>
+
+  <g visibility="hidden">
+    <rect x="260" y="320" width="120" height="52" fill="#fdd835"/>
+    <animate attributeName="visibility" dur="4s" repeatCount="indefinite"
+             calcMode="discrete" values="hidden;visible;hidden" keyTimes="0;0.25;0.75"/>
+  </g>
+
+  <!-- from + by semantics -->
+  <circle cx="500" cy="345" r="22" fill="#6d4c41">
+    <animate attributeName="cx" dur="4s" repeatCount="indefinite" from="500" by="80"/>
+  </circle>
+</svg>
